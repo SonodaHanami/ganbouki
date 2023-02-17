@@ -147,13 +147,13 @@
 
         function handle_random() {
             let options, wish_index, cost_index;
+            options = document.getElementById(`wish${current_line}`).options;
             wish_index = document.getElementById(`wish${current_line}`).selectedIndex;
             if (wish_index == 0) {
-                wish_index = Math.floor(Math.random()*current_settings['wish'].length)
+                wish_index = Math.floor(Math.random() * Math.max(1, options.length - 1)) + 1
             }
-            options = document.getElementById(`wish${current_line}`).options;
             document.getElementById(`td_wish${current_line}`).innerHTML = options[wish_index].innerHTML;
-            cost_index = Math.floor(Math.random()*current_settings['cost'].length)
+            cost_index = Math.floor(Math.random() * current_settings['cost'].length)
             document.getElementById(`td_cost${current_line}`).innerHTML = current_settings['cost'][cost_index];
 
             draw_a_new_line();
