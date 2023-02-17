@@ -1,0 +1,240 @@
+<html>
+
+<head>
+    <title>随机肉鸽许愿机</title>
+    <style>
+        body {
+            padding-top: 10px;
+            padding-left: 10px;
+            padding-right: 10px;
+            /* color: rgb(255, 255, 255); */
+            /* color: rgb(255, 0, 0); */
+            /* font-family: Sarasa; */
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            /* -webkit-text-stroke: #ffffff7f 0.25px; */
+        }
+
+        textarea {
+            width: 100%;
+            resize: none;
+        }
+
+        .text {
+            width: 100%;
+            text-align: left;
+        }
+
+        .text tr {
+            height: 40px;
+        }
+
+        .text th {
+            font-size: 2em;
+        }
+
+        .text td {
+            width: 50%;
+        }
+
+        .text tr td input[type=submit] {
+            height: 40px;
+            width: 100%;
+        }
+
+    </style>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QGM58QCD7C"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-QGM58QCD7C');
+    </script>
+</head>
+
+<body>
+    <table class="text">
+        <tr>
+            <td>
+                <input type="submit" value="设置" onclick="func_click('设置')" id="button_settings">
+            </td>
+            <td>
+                <input type="submit" value="清空(刷新)" onclick="func_click('清空')">
+            </td>
+        </tr>
+    </table>
+    <table class="text" id="table_settings">
+        <tr id="tr_settings" style="display:none">
+            <td colspan="2"><textarea id="textarea_settings" rows="10"></textarea></td>
+        </tr>
+    </table>
+    <table class="text" id="table_text">
+        <tr>
+            <th>我可以</th>
+            <th>但代价是</th>
+        </tr>
+        <tr id="tr_default_new_wish" style="display:none">
+            <td>
+                <select id="wish" name="wish"></select> 或者 直接随机→
+            </td>
+            <td>
+                <input type="submit" value="随机" onclick="func_click('随机')">
+            </td>
+        </tr>
+        <tr id="tr_current_wish0"></tr>
+    </table>
+
+    <script>
+        const choose_one = "选择一个愿望";
+        const default_settings = {
+            "wish" : [
+                "无",
+                "自选任意一张券",
+                "自选一张先锋券",
+                "自选一张近卫券",
+                "自选一张重装券",
+                "自选一张狙击券",
+                "自选一张术师券",
+                "自选一张医疗券",
+                "自选一张辅助券",
+                "自选一张特种券",
+            ],
+            "cost": [
+                "无",
+                "必须进入下一个紧急作战节点",
+                "下一次作战必须至少损失1目标生命值",
+                "下一次作战必须至少损失5目标生命值",
+                "下一次作战必须以1目标生命值结算",
+                "从此不能再换掉任何负面藏品",
+                "下一次进入诡意行商节点不能购物",
+                "从此进入诡意行商节点再也不能购物",
+                "下一次进入诡意行商节点必须购物直到所持源石锭不能支付任何物品",
+                "下一次进入诡意行商节点必须请坎诺特降价",
+                "下一次进入诡意行商节点不能请坎诺特降价",
+                "必须放弃下一个战斗掉落藏品",
+            ]
+        }
+        let current_line = 1;
+        let current_settings = {
+            "wish" : [],
+            "cost": [],
+        };
+
+        function clear() {
+            location.reload();
+        }
+
+        function draw_a_new_line() {
+            current_line += 1;
+            let options = '';
+            for (let i = 1; i <= current_settings['wish'].length; i++) {
+                options += `<option value="${i}">${current_settings['wish'][i - 1]}</option>`
+            }
+            document.getElementById("table_text").innerHTML += `
+                <tr id=tr_current_wish${current_line}>
+                <td id="td_wish${current_line}"><select id="wish${current_line}" name="wish">
+                <option value="-1" selected="selected">选择一个愿望</option>
+                ${options}
+                </select> 或者 直接随机→</td>
+                <td id="td_cost${current_line}"><input type="submit" value="随机" onclick="func_click('随机')"></td></tr>
+            `;
+        }
+
+        function handle_random() {
+            let options, wish_index, cost_index;
+            wish_index = document.getElementById(`wish${current_line}`).selectedIndex;
+            if (wish_index == 0) {
+                wish_index = Math.floor(Math.random()*current_settings['wish'].length)
+            }
+            options = document.getElementById(`wish${current_line}`).options;
+            document.getElementById(`td_wish${current_line}`).innerHTML = options[wish_index].innerHTML;
+            cost_index = Math.floor(Math.random()*current_settings['cost'].length)
+            document.getElementById(`td_cost${current_line}`).innerHTML = current_settings['cost'][cost_index];
+
+            draw_a_new_line();
+        }
+
+        function loadLocalStorage() {
+            if (!window.localStorage) {
+                console.error("浏览器不支持localStorage");
+            }
+            else {
+                console.log("loadLocalStorage()");
+                let k, i, storage = window.localStorage;
+                if (storage['data_ganbouki']) {
+                    const data = JSON.parse(storage['data_ganbouki']);
+                    for (k in default_settings) {
+                        if (data[k]) {
+                            current_settings[k] = data[k].slice();
+                        }
+                        else {
+                            // 初始化
+                            current_settings[k] = default_settings[k].slice();
+                        }
+                    }
+                }
+                else {
+                    // 初始化
+                    for (k in default_settings) {
+                        current_settings[k] = default_settings[k].slice();
+                    }
+                }
+                document.getElementById('textarea_settings').value = JSON.stringify(current_settings, null, 2);
+            }
+        }
+
+        function saveLocalStorage() {
+            if (!window.localStorage) {
+                console.error("浏览器不支持localStorage");
+            }
+            else {
+                console.log("saveLocalStorage()");
+                let k, settings, storage = window.localStorage;
+                let new_settings = {'wish': [], 'cost': []};
+                try {
+                    settings = JSON.parse(document.getElementById('textarea_settings').value);
+                    current_settings['wish'] = settings['wish'].slice();
+                    current_settings['cost'] = settings['cost'].slice();
+                    new_settings['wish'] = settings['wish'].slice();
+                    new_settings['cost'] = settings['cost'].slice();
+                } catch (error) {
+                    console.log(error);
+                    current_settings['wish'] = default_settings['wish'].slice();
+                    current_settings['cost'] = default_settings['cost'].slice();
+                    new_settings['wish'] = default_settings['wish'].slice();
+                    new_settings['cost'] = default_settings['cost'].slice();
+                }
+                document.getElementById('textarea_settings').value = JSON.stringify(current_settings, null, 2);
+                storage['data_ganbouki'] = JSON.stringify(new_settings);
+                // console.log(settings, storage['data_ganbouki']);
+            }
+        }
+
+        function func_click(target) {
+            console.log('button func_click', target);
+            if (target == '清空') {
+                clear();
+            }
+            else if (target == '随机') {
+                handle_random();
+            }
+            else if (target == '设置') {
+                if (document.getElementById('button_settings').value == '设置') {
+                    document.getElementById('tr_settings').style.display = "";
+                    document.getElementById('button_settings').value = "保存设置";
+                }
+                else {
+                    saveLocalStorage();
+                    document.getElementById('tr_settings').style.display = "none";
+                    document.getElementById('button_settings').value = "设置";
+                    // clear();
+                }
+            }
+        }
+
+        loadLocalStorage();
+        draw_a_new_line();
+    </script>
+</body>
+<html>
