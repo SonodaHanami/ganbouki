@@ -95,7 +95,21 @@
     <table class="text" id="table_settings" style="display:none">
         <tr id="tr_warning" style="display:none"><td></td></tr>
         <tr>
-            <td colspan="2"><textarea id="textarea_settings" rows="10"></textarea></td>
+            <td colspan="2">
+                愿望和代价每行一个，空行和每行前后的空格会被自动忽略
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                愿望：
+                <textarea id="textarea_wish" rows="10"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                代价：
+                <textarea id="textarea_cost" rows="10"></textarea>
+            </td>
         </tr>
     </table>
     <table class="text" id="table_text">
@@ -224,7 +238,8 @@
                         current_settings[k] = default_settings[k].slice();
                     }
                 }
-                document.getElementById('textarea_settings').value = JSON.stringify(current_settings, null, 2);
+                document.getElementById('textarea_wish').value = current_settings['wish'].join('\n');
+                document.getElementById('textarea_cost').value = current_settings['cost'].join('\n');
             }
         }
 
@@ -234,25 +249,32 @@
             }
             else {
                 console.log("saveLocalStorage()");
-                let k, settings, storage = window.localStorage;
-                let new_settings = {'wish': [], 'cost': []};
+                let i, wish, cost, storage = window.localStorage;
                 try {
-                    settings = JSON.parse(document.getElementById('textarea_settings').value);
-                    current_settings['wish'] = settings['wish'].slice();
-                    current_settings['cost'] = settings['cost'].slice();
-                    new_settings['wish'] = settings['wish'].slice();
-                    new_settings['cost'] = settings['cost'].slice();
+                    wish = document.getElementById('textarea_wish').value.split('\n');
+                    cost = document.getElementById('textarea_cost').value.split('\n');
+                    current_settings['wish'] = [];
+                    current_settings['cost'] = [];
+                    for (i = 0; i < wish.length; i++) {
+                        if (wish[i].trim().length > 0) {
+                            current_settings['wish'].push(wish[i].trim())
+                        }
+                    }
+                    for (i = 0; i < cost.length; i++) {
+                        if (cost[i].trim().length > 0) {
+                            current_settings['cost'].push(cost[i].trim())
+                        }
+                    }
                 } catch (error) {
                     document.getElementById('tr_warning').style.display = "";
                     document.getElementById('tr_warning').innerHTML = `<td>保存失败，请检查格式 ${error}</td>`
                     return false;
                     current_settings['wish'] = default_settings['wish'].slice();
                     current_settings['cost'] = default_settings['cost'].slice();
-                    new_settings['wish'] = default_settings['wish'].slice();
-                    new_settings['cost'] = default_settings['cost'].slice();
                 }
-                document.getElementById('textarea_settings').value = JSON.stringify(current_settings, null, 2);
-                storage['data_ganbouki'] = JSON.stringify(new_settings);
+                document.getElementById('textarea_wish').value = current_settings['wish'].join('\n');
+                document.getElementById('textarea_cost').value = current_settings['cost'].join('\n');
+                storage['data_ganbouki'] = JSON.stringify(current_settings);
                 // console.log(settings, storage['data_ganbouki']);
                 return true;
             }
