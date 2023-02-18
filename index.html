@@ -91,6 +91,7 @@
 
     <script>
         const choose_one = "选择一个愿望";
+        const block_text = '❓❓❓❓❓❓❓❓❓❓❓❓❓❓❓❓';
         const default_settings = {
             "wish" : [
                 "无（大失败）",
@@ -146,7 +147,7 @@
         }
 
         function handle_random() {
-            let options, wish_index, cost_index;
+            let options, wish_index, cost_index, cost_length, cost_text;
             options = document.getElementById(`wish${current_line}`).options;
             wish_index = document.getElementById(`wish${current_line}`).selectedIndex;
             if (wish_index == 0) {
@@ -154,9 +155,31 @@
             }
             document.getElementById(`td_wish${current_line}`).innerHTML = options[wish_index].innerHTML;
             cost_index = Math.floor(Math.random() * current_settings['cost'].length)
-            document.getElementById(`td_cost${current_line}`).innerHTML = current_settings['cost'][cost_index];
+            // document.getElementById(`td_cost${current_line}`).innerHTML = current_settings['cost'][cost_index];
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    let j = Math.floor(Math.random() * current_settings['cost'].length);
+                    cost_text = current_settings['cost'][j];
+                    draw_cost(current_line, cost_text);
+                }, i * 100);
+            }
+            cost_length = current_settings['cost'][cost_index].length;
+            setTimeout(() => {
+                    cost_text = block_text.slice(0, cost_length);
+                    draw_cost(current_line, cost_text);
+                }, 1000);
+            for (let k = 1; k <= cost_length; k++) {
+                setTimeout(() => {
+                    cost_text = current_settings['cost'][cost_index].slice(0, k) + block_text.slice(0, cost_length - k);
+                    draw_cost(current_line, cost_text);
+                }, 1500 + k * 50);
+            }
 
-            draw_a_new_line();
+            setTimeout(() => draw_a_new_line(), 1600 + cost_length * 50);
+        }
+
+        function draw_cost(line_idx, cost_text) {
+            document.getElementById(`td_cost${line_idx}`).innerHTML = cost_text;
         }
 
         function loadLocalStorage() {
