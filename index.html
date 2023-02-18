@@ -91,7 +91,6 @@
                 <input type="submit" value="清空（刷新）" onclick="func_click('清空')">
             </td>
         </tr>
-        <tr></tr>
     </table>
     <table class="text" id="table_settings" style="display:none">
         <tr id="tr_warning" style="display:none"><td></td></tr>
@@ -100,6 +99,7 @@
         </tr>
     </table>
     <table class="text" id="table_text">
+        <tr></tr>
         <tr>
             <th>我可以</th>
             <th>但代价是</th>
@@ -137,7 +137,7 @@
                 "必须放弃下一个战斗掉落藏品",
             ]
         }
-        let current_line = 0;
+        let current_row = 0;
         let current_settings = {
             "wish" : [],
             "cost": [],
@@ -147,56 +147,56 @@
             location.reload();
         }
 
-        function draw_a_new_line() {
-            current_line += 1;
+        function draw_a_new_row() {
+            current_row += 1;
             let options = '', tr_class = '';
             for (let i = 1; i <= current_settings['wish'].length; i++) {
                 options += `<option value="${i}">${current_settings['wish'][i - 1]}</option>`
             }
-            tr_class = current_line % 2 == 0 ? 'tr_light' : 'tr_deep';
+            tr_class = current_row % 2 == 0 ? 'tr_light' : 'tr_deep';
             document.getElementById("table_text").innerHTML += `
-                <tr id="tr_current_wish${current_line}" class="${tr_class}">
-                <td id="td_wish${current_line}"><select id="wish${current_line}" name="wish">
+                <tr id="tr_current_wish${current_row}" class="${tr_class}">
+                <td id="td_wish${current_row}"><select id="wish${current_row}" name="wish">
                 <option value="-1" selected="selected">选择一个愿望</option>
                 ${options}
                 </select> 或者 直接随机→</td>
-                <td id="td_cost${current_line}"><input type="submit" value="随机" onclick="func_click('随机')"></td></tr>
+                <td id="td_cost${current_row}"><input type="submit" value="随机" onclick="func_click('随机')"></td></tr>
             `;
         }
 
         function handle_random() {
             let options, wish_index, cost_index, cost_length;
             let block_text, cost_text;
-            options = document.getElementById(`wish${current_line}`).options;
-            wish_index = document.getElementById(`wish${current_line}`).selectedIndex;
+            options = document.getElementById(`wish${current_row}`).options;
+            wish_index = document.getElementById(`wish${current_row}`).selectedIndex;
             if (wish_index == 0) {
                 wish_index = Math.floor(Math.random() * Math.max(1, options.length - 1)) + 1
             }
-            document.getElementById(`td_wish${current_line}`).innerHTML = options[wish_index].innerHTML;
+            document.getElementById(`td_wish${current_row}`).innerHTML = options[wish_index].innerHTML;
             cost_index = Math.floor(Math.random() * current_settings['cost'].length)
-            // document.getElementById(`td_cost${current_line}`).innerHTML = current_settings['cost'][cost_index];
+            // document.getElementById(`td_cost${current_row}`).innerHTML = current_settings['cost'][cost_index];
             for (let i = 0; i < 10; i++) {
                 setTimeout(() => {
                     let j = Math.floor(Math.random() * current_settings['cost'].length);
                     cost_text = current_settings['cost'][j];
-                    draw_cost(current_line, cost_text);
+                    draw_cost(current_row, cost_text);
                 }, i * 100);
             }
             cost_length = current_settings['cost'][cost_index].length;
             block_text = question_mark.repeat(cost_length);
-            setTimeout(() => draw_cost(current_line, block_text), 1000);
+            setTimeout(() => draw_cost(current_row, block_text), 1000);
             for (let k = 1; k <= cost_length; k++) {
                 setTimeout(() => {
                     cost_text = current_settings['cost'][cost_index].slice(0, k) + block_text.slice(0, cost_length - k);
-                    draw_cost(current_line, cost_text);
+                    draw_cost(current_row, cost_text);
                 }, 1500 + k * 50);
             }
 
-            setTimeout(() => draw_a_new_line(), 1600 + cost_length * 50);
+            setTimeout(() => draw_a_new_row(), 1600 + cost_length * 50);
         }
 
-        function draw_cost(line_idx, cost_text) {
-            document.getElementById(`td_cost${line_idx}`).innerHTML = cost_text;
+        function draw_cost(row_idx, cost_text) {
+            document.getElementById(`td_cost${row_idx}`).innerHTML = cost_text;
         }
 
         function loadLocalStorage() {
@@ -283,7 +283,7 @@
         }
 
         loadLocalStorage();
-        draw_a_new_line();
+        draw_a_new_row();
     </script>
 </body>
 <html>
