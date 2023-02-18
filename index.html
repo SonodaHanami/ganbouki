@@ -24,10 +24,11 @@
         .text {
             width: 100%;
             text-align: left;
+            table-layout: fixed;
         }
 
         .text tr {
-            height: 40px;
+            height: 50px;
         }
 
         .text th {
@@ -35,6 +36,7 @@
         }
 
         .text td {
+            height: 50px;
             width: 50%;
         }
 
@@ -46,6 +48,29 @@
         #tr_warning {
             color: red;
         }
+
+        #table_text {
+            border-collapse: collapse;
+        }
+
+        #table_text tr td {
+            border-width: 1px;
+            border-color: #666666;
+            border-top-style: solid;
+            border-bottom-style: solid;
+            border-left-style: dashed;
+            border-right-style: dashed;
+            padding: 5px;
+        }
+
+        .tr_deep {
+            background-color: #E9E9E9;
+        }
+
+        .tr_light {
+            background-color: #FFFFFF;
+        }
+
     </style>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QGM58QCD7C"></script>
     <script>
@@ -66,6 +91,7 @@
                 <input type="submit" value="清空（刷新）" onclick="func_click('清空')">
             </td>
         </tr>
+        <tr></tr>
     </table>
     <table class="text" id="table_settings" style="display:none">
         <tr id="tr_warning" style="display:none"><td></td></tr>
@@ -78,20 +104,11 @@
             <th>我可以</th>
             <th>但代价是</th>
         </tr>
-        <tr id="tr_default_new_wish" style="display:none">
-            <td>
-                <select id="wish" name="wish"></select> 或者 直接随机→
-            </td>
-            <td>
-                <input type="submit" value="随机" onclick="func_click('随机')">
-            </td>
-        </tr>
-        <tr id="tr_current_wish0"></tr>
     </table>
 
     <script>
         const choose_one = "选择一个愿望";
-        const block_text = '❓❓❓❓❓❓❓❓❓❓❓❓❓❓❓❓';
+        const question_mark = '？';
         const default_settings = {
             "wish" : [
                 "无（大失败）",
@@ -120,7 +137,7 @@
                 "必须放弃下一个战斗掉落藏品",
             ]
         }
-        let current_line = 1;
+        let current_line = 0;
         let current_settings = {
             "wish" : [],
             "cost": [],
@@ -132,12 +149,13 @@
 
         function draw_a_new_line() {
             current_line += 1;
-            let options = '';
+            let options = '', tr_class = '';
             for (let i = 1; i <= current_settings['wish'].length; i++) {
                 options += `<option value="${i}">${current_settings['wish'][i - 1]}</option>`
             }
+            tr_class = current_line % 2 == 0 ? 'tr_light' : 'tr_deep';
             document.getElementById("table_text").innerHTML += `
-                <tr id=tr_current_wish${current_line}>
+                <tr id="tr_current_wish${current_line}" class="${tr_class}">
                 <td id="td_wish${current_line}"><select id="wish${current_line}" name="wish">
                 <option value="-1" selected="selected">选择一个愿望</option>
                 ${options}
@@ -147,7 +165,8 @@
         }
 
         function handle_random() {
-            let options, wish_index, cost_index, cost_length, cost_text;
+            let options, wish_index, cost_index, cost_length;
+            let block_text, cost_text;
             options = document.getElementById(`wish${current_line}`).options;
             wish_index = document.getElementById(`wish${current_line}`).selectedIndex;
             if (wish_index == 0) {
@@ -164,10 +183,8 @@
                 }, i * 100);
             }
             cost_length = current_settings['cost'][cost_index].length;
-            setTimeout(() => {
-                    cost_text = block_text.slice(0, cost_length);
-                    draw_cost(current_line, cost_text);
-                }, 1000);
+            block_text = question_mark.repeat(cost_length);
+            setTimeout(() => draw_cost(current_line, block_text), 1000);
             for (let k = 1; k <= cost_length; k++) {
                 setTimeout(() => {
                     cost_text = current_settings['cost'][cost_index].slice(0, k) + block_text.slice(0, cost_length - k);
