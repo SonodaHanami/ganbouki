@@ -161,21 +161,41 @@
             location.reload();
         }
 
-        function draw_a_new_row() {
-            current_row += 1;
+        function draw_new_row(is_redraw=false) {
             let options = '', tr_class = '';
             for (let i = 1; i <= current_settings['wish'].length; i++) {
                 options += `<option value="${i}">${current_settings['wish'][i - 1]}</option>`
             }
-            tr_class = current_row % 2 == 0 ? 'tr_light' : 'tr_deep';
-            document.getElementById("table_text").innerHTML += `
-                <tr id="tr_current_wish${current_row}" class="${tr_class}">
-                <td id="td_wish${current_row}"><select id="wish${current_row}" name="wish">
-                <option value="-1" selected="selected">选择一个愿望</option>
-                ${options}
-                </select> 或者 直接随机→</td>
-                <td id="td_cost${current_row}"><input type="submit" value="随机" onclick="func_click('随机')"></td></tr>
-            `;
+            if (is_redraw) {
+                document.getElementById(`tr_current_wish${current_row}`).innerHTML = `
+                    <td id="td_wish${current_row}">
+                    <select id="wish${current_row}" name="wish">
+                    <option value="-1" selected="selected">选择一个愿望</option>
+                    ${options}
+                    </select> 或者 直接随机→
+                    </td>
+                    <td id="td_cost${current_row}">
+                    <input type="submit" value="随机" onclick="func_click('随机')">
+                    </td>
+                `
+            }
+            else {
+                current_row += 1;
+                tr_class = current_row % 2 == 0 ? 'tr_light' : 'tr_deep';
+                document.getElementById("table_text").innerHTML += `
+                    <tr id="tr_current_wish${current_row}" class="${tr_class}">
+                    <td id="td_wish${current_row}">
+                    <select id="wish${current_row}" name="wish">
+                    <option value="-1" selected="selected">选择一个愿望</option>
+                    ${options}
+                    </select> 或者 直接随机→
+                    </td>
+                    <td id="td_cost${current_row}">
+                    <input type="submit" value="随机" onclick="func_click('随机')">
+                    </td>
+                    </tr>
+                `;
+            }
         }
 
         function handle_random() {
@@ -206,7 +226,7 @@
                 }, 1500 + k * 50);
             }
 
-            setTimeout(() => draw_a_new_row(), 1600 + cost_length * 50);
+            setTimeout(() => draw_new_row(), 1600 + cost_length * 50);
         }
 
         function draw_cost(row_idx, cost_text) {
@@ -291,21 +311,21 @@
             else if (target == '设置') {
                 if (document.getElementById('button_settings').value == '设置') {
                     document.getElementById('table_settings').style.display = "";
-                    document.getElementById('button_settings').value = "保存设置并刷新";
+                    document.getElementById('button_settings').value = "保存设置";
                 }
                 else {
                     if (saveLocalStorage()) {
                         document.getElementById('tr_warning').style.display = "none";
                         document.getElementById('table_settings').style.display = "none";
                         document.getElementById('button_settings').value = "设置";
-                        clear();
+                        draw_new_row(true);
                     };
                 }
             }
         }
 
         loadLocalStorage();
-        draw_a_new_row();
+        draw_new_row();
     </script>
 </body>
 <html>
