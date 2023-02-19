@@ -291,15 +291,15 @@
             else if (target == '设置') {
                 if (document.getElementById('button_settings').value == '设置') {
                     document.getElementById('table_settings').style.display = "";
-                    document.getElementById('button_settings').value = "保存设置";
+                    document.getElementById('button_settings').value = "保存设置并刷新";
                 }
                 else {
                     if (saveLocalStorage()) {
                         document.getElementById('tr_warning').style.display = "none";
                         document.getElementById('table_settings').style.display = "none";
                         document.getElementById('button_settings').value = "设置";
+                        clear();
                     };
-                    // clear();
                 }
             }
         }
