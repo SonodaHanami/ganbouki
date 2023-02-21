@@ -7,13 +7,11 @@
             padding-top: 10px;
             padding-left: 10px;
             padding-right: 10px;
-            /* color: rgb(255, 255, 255); */
-            /* color: rgb(255, 0, 0); */
-            /* font-family: Sarasa; */
+            color: #FFF;
+            text-shadow: -2px -2px #000, -2px -1px #000, -2px 0 #000, -2px 1px #000, -2px 2px #000, -1px -2px #000, -1px -1px #000, -1px 0 #000, -1px 1px #000, -1px 2px #000, 0 -2px #000, 0 -1px #000, 0 0 #000, 0 1px #000, 0 2px #000, 1px -2px #000, 1px -1px #000, 1px 0 #000, 1px 1px #000, 1px 2px #000, 2px -2px #000, 2px -1px #000, 2px 0 #000, 2px 1px #000, 2px 2px #000;
             font-size: 32px;
             font-weight: bold;
             text-align: center;
-            /* -webkit-text-stroke: #ffffff7f 0.25px; */
         }
 
         textarea {
@@ -33,6 +31,7 @@
 
         .text th {
             font-size: 2em;
+            padding: 10px;
         }
 
         .text td {
@@ -43,6 +42,15 @@
         .text tr td input[type=submit] {
             height: 40px;
             width: 100%;
+        }
+
+        .div_button {
+            background-color: #F0F0F07F;
+            padding: 10px;
+            border-radius: 3px;
+            border-color: #000;
+            border-style: solid;
+            border-width: 1px;
         }
 
         #tr_warning {
@@ -60,15 +68,32 @@
             border-bottom-style: solid;
             border-left-style: dashed;
             border-right-style: dashed;
-            padding: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
         }
 
         .tr_deep {
-            background-color: #E9E9E9;
+            background-color: #E9E9E97F;
         }
 
         .tr_light {
-            background-color: #FFFFFF;
+            background-color: #FFFFFF2A;
+        }
+
+        #div_wish_options {
+            position:absolute;
+            margin-top: 15px;
+        }
+
+        .wish_option {
+            background-color: #DDDDDD7F;
+            height: 20px;
+            padding: 3px 10px;
+            margin-top: 2px;
+            border-radius: 3px;
+            border-style: solid;
+            border-width: 0.5px;
+            border-color: #000;
         }
 
     </style>
@@ -85,10 +110,10 @@
     <table class="text">
         <tr>
             <td>
-                <input type="submit" value="设置" onclick="func_click('设置')" id="button_settings">
+                <input type="submit" value="设置" id="button_settings" onclick="func_click('设置');">
             </td>
             <td>
-                <input type="submit" value="清空（刷新）" onclick="func_click('清空')">
+                <input type="submit" value="清空（刷新）" onclick="location.reload();">
             </td>
         </tr>
     </table>
@@ -156,59 +181,56 @@
             "wish" : [],
             "cost": [],
         };
+        let current_wish_index = -1;
+        let last_toggle = 0;
 
-        function clear() {
-            location.reload();
-        }
-
-        function draw_new_row(is_redraw=false) {
-            let options = '', tr_class = '';
-            for (let i = 1; i <= current_settings['wish'].length; i++) {
-                options += `<option value="${i}">${current_settings['wish'][i - 1]}</option>`
-            }
-            if (is_redraw) {
-                document.getElementById(`tr_current_wish${current_row}`).innerHTML = `
-                    <td id="td_wish${current_row}">
-                    <select id="wish${current_row}" name="wish">
-                    <option value="-1" selected="selected">选择一个愿望</option>
-                    ${options}
-                    </select> 或者 直接随机→
-                    </td>
-                    <td id="td_cost${current_row}">
-                    <input type="submit" value="随机" onclick="func_click('随机')">
-                    </td>
-                `
-            }
-            else {
+        function draw_row(new_row=true) {
+            let options, tr_class, row_content;
+            if (new_row) {
                 current_row += 1;
+            }
+            options = `<div id="div_wish_options" style="display:none">`;
+            for (let i = 0; i < current_settings['wish'].length; i++) {
+                options += `
+                    <div class="wish_option" id="div_wish_option_${i}" onclick="handle_wish_options(${i});">
+                        ${current_settings['wish'][i]}
+                    </div>
+                `;
+            }
+            options += `</div>`;
+            wish_row_content = `
+                <td id="td_wish_${current_row}">
+                    <div class="div_button" id="div_wish" onclick="handle_wish_options(-1);">
+                        <div id="div_current_wish">点击选择一个愿望 或者 直接随机→</div>
+                        ${options}
+                    </div>
+                </td>
+                <td id="td_cost_${current_row}">
+                    <div class="div_button" onclick="handle_random();">点击随机抽取代价</div>
+                </td>
+            `;
+            if (new_row) {
                 tr_class = current_row % 2 == 0 ? 'tr_light' : 'tr_deep';
                 document.getElementById("table_text").innerHTML += `
-                    <tr id="tr_current_wish${current_row}" class="${tr_class}">
-                    <td id="td_wish${current_row}">
-                    <select id="wish${current_row}" name="wish">
-                    <option value="-1" selected="selected">选择一个愿望</option>
-                    ${options}
-                    </select> 或者 直接随机→
-                    </td>
-                    <td id="td_cost${current_row}">
-                    <input type="submit" value="随机" onclick="func_click('随机')">
-                    </td>
+                    <tr id="tr_${current_row}" class="${tr_class}">
+                        ${wish_row_content}
                     </tr>
                 `;
+                current_wish_index = -1;
+            }
+            else {
+                document.getElementById(`tr_${current_row}`).innerHTML = wish_row_content;
             }
         }
 
         function handle_random() {
-            let options, wish_index, cost_index, cost_length;
+            let cost_index, cost_length;
             let block_text, cost_text;
-            options = document.getElementById(`wish${current_row}`).options;
-            wish_index = document.getElementById(`wish${current_row}`).selectedIndex;
-            if (wish_index == 0) {
-                wish_index = Math.floor(Math.random() * Math.max(1, options.length - 1)) + 1
+            if (current_wish_index == -1) {
+                current_wish_index = Math.floor(Math.random() * Math.max(1, current_settings['wish'].length - 1)) + 1;
             }
-            document.getElementById(`td_wish${current_row}`).innerHTML = options[wish_index].innerHTML;
-            cost_index = Math.floor(Math.random() * current_settings['cost'].length)
-            // document.getElementById(`td_cost${current_row}`).innerHTML = current_settings['cost'][cost_index];
+            document.getElementById(`td_wish_${current_row}`).innerHTML = current_settings['wish'][current_wish_index];
+            cost_index = Math.floor(Math.random() * current_settings['cost'].length);
             for (let i = 0; i < 10; i++) {
                 setTimeout(() => {
                     let j = Math.floor(Math.random() * current_settings['cost'].length);
@@ -226,11 +248,43 @@
                 }, 1500 + k * 50);
             }
 
-            setTimeout(() => draw_new_row(), 1600 + cost_length * 50);
+            setTimeout(() => draw_row(), 1600 + cost_length * 50);
         }
 
         function draw_cost(row_idx, cost_text) {
-            document.getElementById(`td_cost${row_idx}`).innerHTML = cost_text;
+            document.getElementById(`td_cost_${row_idx}`).innerHTML = cost_text;
+        }
+
+        function handle_wish_options(wish_index) {
+            if (wish_index == -1) {
+                handle_toggle_wish_options(true);
+            }
+            else {
+                current_wish_index = wish_index;
+                document.getElementById(`div_current_wish`).innerHTML = current_settings['wish'][wish_index];
+                handle_toggle_wish_options();
+            }
+        }
+
+        function handle_toggle_wish_options(is_on=false) {
+            let now = new Date() * 1;
+            if (now - last_toggle < 100) {
+                return false;
+            }
+            if (is_on) {
+                if (document.getElementById('div_wish_options').style.display == "none") {
+                    document.getElementById('div_wish_options').style.display = "";
+                }
+                else {
+                    document.getElementById('div_wish_options').style.display = "none";
+                }
+            }
+            else {
+                if (document.getElementById('div_wish_options')) {
+                    document.getElementById('div_wish_options').style.display = "none";
+                }
+            }
+            last_toggle = now;
         }
 
         function loadLocalStorage() {
@@ -295,20 +349,12 @@
                 document.getElementById('textarea_wish').value = current_settings['wish'].join('\n');
                 document.getElementById('textarea_cost').value = current_settings['cost'].join('\n');
                 storage['data_ganbouki'] = JSON.stringify(current_settings);
-                // console.log(settings, storage['data_ganbouki']);
                 return true;
             }
         }
 
         function func_click(target) {
-            console.log('button func_click', target);
-            if (target == '清空') {
-                clear();
-            }
-            else if (target == '随机') {
-                handle_random();
-            }
-            else if (target == '设置') {
+            if (target == '设置') {
                 if (document.getElementById('button_settings').value == '设置') {
                     document.getElementById('table_settings').style.display = "";
                     document.getElementById('button_settings').value = "保存设置";
@@ -318,14 +364,17 @@
                         document.getElementById('tr_warning').style.display = "none";
                         document.getElementById('table_settings').style.display = "none";
                         document.getElementById('button_settings').value = "设置";
-                        draw_new_row(true);
+                        draw_row(false);
                     };
                 }
             }
         }
 
+        document.onclick = () => {
+            handle_toggle_wish_options();
+        }
         loadLocalStorage();
-        draw_new_row();
+        draw_row();
     </script>
 </body>
 <html>
