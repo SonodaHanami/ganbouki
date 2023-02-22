@@ -46,7 +46,7 @@
             border-collapse: collapse;
         }
 
-        #table_text tr td {
+        td[id^="td_wish"], td[id^="td_cost"] {
             border-width: 1px;
             border-color: #AAAAAA;
             border-top-style: solid;
@@ -86,6 +86,16 @@
         .div_button:hover, .wish_option:hover {
             background-color: #2B666666;
         }
+
+        #td_md5 {
+            text-align: center;
+            opacity: 0;
+        }
+
+        #td_md5:hover {
+            opacity: 1;
+            background-color: #2B666666;
+        }
     </style>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QGM58QCD7C"></script>
     <script>
@@ -112,7 +122,7 @@
         <tr id="tr_warning" style="display:none"></tr>
         <tr>
             <td colspan="2">
-                当前设置md5：<span id="span_md5">undefined</span>
+                当前设置md5：<span id="span_md5_1">undefined</span>
             </td>
         </tr>
         <tr>
@@ -134,7 +144,11 @@
         </tr>
     </table>
     <table class="text" id="table_text">
-        <tr></tr>
+        <tr>
+            <td colspan="2" id="td_md5" onclick="handle_td_md5();">
+                当前设置md5：<span id="span_md5_0">undefined</span>
+            </td>
+        </tr>
         <tr>
             <th>我可以</th>
             <th>但代价是</th>
@@ -310,7 +324,17 @@
             else {
                 let storage = window.localStorage;
                 settings_md5 = md5(storage['data_ganbouki']);
-                document.getElementById('span_md5').innerHTML = settings_md5;
+                document.getElementById('span_md5_0').innerHTML = settings_md5;
+                document.getElementById('span_md5_1').innerHTML = settings_md5;
+            }
+        }
+
+        function handle_td_md5() {
+            if (document.getElementById('td_md5').style.opacity == 0) {
+                document.getElementById('td_md5').style.opacity = 1;
+            }
+            else {
+                document.getElementById('td_md5').style.removeProperty('opacity');
             }
         }
 
@@ -396,12 +420,12 @@
             }
         }
 
-        document.onclick = () => {
-            handle_toggle_wish_options();
-        }
         load_settings();
         handle_md5();
         draw_row();
+        document.onclick = () => {
+            handle_toggle_wish_options();
+        }
     </script>
 </body>
 <html>
