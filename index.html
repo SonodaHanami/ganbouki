@@ -94,21 +94,27 @@
         gtag('js', new Date());
         gtag('config', 'G-QGM58QCD7C');
     </script>
+    <script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script>
 </head>
 
 <body>
     <table class="text">
         <tr>
             <td>
-                <div class="div_button" id="button_settings" onclick="func_click('设置');">设置</div>
+                <div class="div_button" id="div_settings" onclick="handle_settings();">设置</div>
             </td>
             <td>
-                <div class="div_button" id="button_clear" onclick="location.reload();">清空（刷新）</div>
+                <div class="div_button" onclick="location.reload();">清空（刷新）</div>
             </td>
         </tr>
     </table>
     <table class="text" id="table_settings" style="display:none">
-        <tr id="tr_warning" style="display:none"><td></td></tr>
+        <tr id="tr_warning" style="display:none"></tr>
+        <tr>
+            <td colspan="2">
+                当前设置md5：<span id="span_md5">undefined</span>
+            </td>
+        </tr>
         <tr>
             <td colspan="2">
                 愿望和代价每行一个，空行和每行前后的空格会被自动忽略
@@ -174,6 +180,7 @@
         };
         let current_wish_index = -1;
         let last_toggle = 0;
+        let settings_md5 = '';
 
         function draw_row(new_row=true) {
             let options, row_content;
@@ -296,12 +303,23 @@
             last_toggle = now;
         }
 
-        function loadLocalStorage() {
+        function handle_md5() {
             if (!window.localStorage) {
                 console.error("浏览器不支持localStorage");
             }
             else {
-                console.log("loadLocalStorage()");
+                let storage = window.localStorage;
+                settings_md5 = md5(storage['data_ganbouki']);
+                document.getElementById('span_md5').innerHTML = settings_md5;
+            }
+        }
+
+        function load_settings() {
+            if (!window.localStorage) {
+                console.error("浏览器不支持localStorage");
+            }
+            else {
+                console.log("load_settings()");
                 let k, i, storage = window.localStorage;
                 if (storage['data_ganbouki']) {
                     const data = JSON.parse(storage['data_ganbouki']);
@@ -326,12 +344,12 @@
             }
         }
 
-        function saveLocalStorage() {
+        function save_settings() {
             if (!window.localStorage) {
                 console.error("浏览器不支持localStorage");
             }
             else {
-                console.log("saveLocalStorage()");
+                console.log("save_settings()");
                 let i, wish, cost, storage = window.localStorage;
                 try {
                     wish = document.getElementById('textarea_wish').value.split('\n');
@@ -358,31 +376,31 @@
                 document.getElementById('textarea_wish').value = current_settings['wish'].join('\n');
                 document.getElementById('textarea_cost').value = current_settings['cost'].join('\n');
                 storage['data_ganbouki'] = JSON.stringify(current_settings);
+                handle_md5();
                 return true;
             }
         }
 
-        function func_click(target) {
-            if (target == '设置') {
-                if (document.getElementById('button_settings').innerHTML == '设置') {
-                    document.getElementById('table_settings').style.display = "";
-                    document.getElementById('button_settings').innerHTML = "保存设置";
-                }
-                else {
-                    if (saveLocalStorage()) {
-                        document.getElementById('tr_warning').style.display = "none";
-                        document.getElementById('table_settings').style.display = "none";
-                        document.getElementById('button_settings').innerHTML = "设置";
-                        draw_row(false);
-                    };
-                }
+        function handle_settings() {
+            if (document.getElementById('table_settings').style.display == 'none') {
+                document.getElementById('table_settings').style.display = '';
+                document.getElementById('div_settings').innerHTML = "保存设置";
+            }
+            else {
+                if (save_settings()) {
+                    document.getElementById('tr_warning').style.display = 'none';
+                    document.getElementById('table_settings').style.display = 'none';
+                    document.getElementById('div_settings').innerHTML = '设置';
+                    draw_row(false);
+                };
             }
         }
 
         document.onclick = () => {
             handle_toggle_wish_options();
         }
-        loadLocalStorage();
+        load_settings();
+        handle_md5();
         draw_row();
     </script>
 </body>
