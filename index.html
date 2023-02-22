@@ -228,11 +228,12 @@
                 }, i * 100);
             }
             cost_length = current_settings['cost'][cost_index].length;
-            block_text = question_mark.repeat(cost_length);
+            block_text = question_mark.repeat(5);
             setTimeout(() => draw_cost(current_row, block_text), 1000);
             for (let k = 1; k <= cost_length; k++) {
                 setTimeout(() => {
-                    cost_text = current_settings['cost'][cost_index].slice(0, k) + block_text.slice(0, cost_length - k);
+                    cost_text = current_settings['cost'][cost_index].slice(0, k) + block_text;
+                    cost_text = cost_text.slice(0, Math.min(cost_length, k + 5));
                     draw_cost(current_row, cost_text);
                 }, 1233 + k * 1000 / cost_length);
             }
