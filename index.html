@@ -138,6 +138,7 @@
     <script>
         const choose_one = "选择一个愿望";
         const question_mark = '？';
+        const window_length = 10;
         const default_settings = {
             "wish" : [
                 "无（大失败）",
@@ -228,14 +229,32 @@
                 }, i * 100);
             }
             cost_length = current_settings['cost'][cost_index].length;
-            block_text = question_mark.repeat(5);
+            block_text = question_mark.repeat(window_length);
             setTimeout(() => draw_cost(current_row, block_text), 1000);
-            for (let k = 1; k <= cost_length; k++) {
-                setTimeout(() => {
-                    cost_text = current_settings['cost'][cost_index].slice(0, k) + block_text;
-                    cost_text = cost_text.slice(0, Math.min(cost_length, k + 5));
-                    draw_cost(current_row, cost_text);
-                }, 1233 + k * 1000 / cost_length);
+            if (cost_length < window_length) {
+                for (let k = 1; k <= window_length; k++) {
+                    setTimeout(() => {
+                        cost_text = '';
+                        if (k + cost_length - window_length > 0) {
+                            cost_text = current_settings['cost'][cost_index].slice(window_length - k, cost_length);
+                        }
+                        cost_text = block_text.slice(0, window_length - k) + cost_text;
+                        cost_text = cost_text.slice(0, Math.max(cost_length, window_length - k));
+                        draw_cost(current_row, cost_text);
+                    }, 1233 + k * 1000 / window_length);
+                }
+            }
+            else {
+                for (let k = 1; k <= cost_length; k++) {
+                    setTimeout(() => {
+                        cost_text = current_settings['cost'][cost_index].slice(0, k);
+                        if (k < window_length) {
+                            cost_text = cost_text + block_text;
+                            cost_text = cost_text.slice(0, window_length);
+                        }
+                        draw_cost(current_row, cost_text);
+                    }, 1233 + k * 1000 / cost_length);
+                }
             }
 
             setTimeout(() => draw_row(), 2333);
