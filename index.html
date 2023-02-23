@@ -87,6 +87,33 @@
             background-color: #2B666666;
         }
 
+        #tr_notice {
+            background-color: #ffbf92;
+        }
+
+        #td_notice {
+            width: 80%;
+            padding-left: 10px;
+        }
+
+        #td_notice_button {
+            width: 20%;
+            padding-right: 10px;
+            text-align: right;
+        }
+
+        .div_notice_button {
+            width: 50px;
+            display: inline-block;
+            background-color: #F0F0F07F;
+            padding: 10px;
+            border-radius: 3px;
+            border-color: #000;
+            border-style: solid;
+            border-width: 1px;
+            text-align: center;
+        }
+
         #td_md5 {
             text-align: center;
             opacity: 0;
@@ -105,13 +132,14 @@
         gtag('config', 'G-QGM58QCD7C');
     </script>
     <script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script>
+    <script src="default.js"></script>
 </head>
 
 <body>
     <table class="text">
         <tr>
             <td>
-                <div class="div_button" id="div_settings" onclick="handle_settings();">设置</div>
+                <div class="div_button" id="div_settings" onclick="handle_button_settings();">设置</div>
             </td>
             <td>
                 <div class="div_button" onclick="location.reload();">清空（刷新）</div>
@@ -144,6 +172,10 @@
         </tr>
     </table>
     <table class="text" id="table_text">
+        <tr id="tr_notice" style="display:none">
+            <td id="td_notice"></td>
+            <td id="td_notice_button"></td>
+        </tr>
         <tr>
             <td colspan="2" id="td_md5" onclick="handle_td_md5();">
                 当前设置md5：<span id="span_md5_0">undefined</span>
@@ -159,34 +191,6 @@
         const choose_one = "选择一个愿望";
         const question_mark = '？';
         const window_length = 10;
-        const default_settings = {
-            "wish" : [
-                "无（大失败）",
-                "自选任意一张券",
-                "自选一张先锋券",
-                "自选一张近卫券",
-                "自选一张重装券",
-                "自选一张狙击券",
-                "自选一张术师券",
-                "自选一张医疗券",
-                "自选一张辅助券",
-                "自选一张特种券",
-            ],
-            "cost": [
-                "无（大成功）",
-                "必须进入下一个紧急作战节点",
-                "下一次作战必须至少损失1目标生命值",
-                "下一次作战必须至少损失5目标生命值",
-                "下一次作战必须以1目标生命值结算",
-                "从此不能再换掉任何负面藏品",
-                "下一次进入诡意行商节点不能购物",
-                "从此进入诡意行商节点再也不能购物",
-                "下一次进入诡意行商节点必须购物直到所持源石锭不能支付任何物品",
-                "下一次进入诡意行商节点必须请坎诺特降价",
-                "下一次进入诡意行商节点不能请坎诺特降价",
-                "必须放弃下一个战斗掉落藏品",
-            ]
-        }
         let current_row = 0;
         let current_settings = {
             "wish" : [],
@@ -194,7 +198,9 @@
         };
         let current_wish_index = -1;
         let last_toggle = 0;
-        let settings_md5 = '';
+        let current_settings_md5 = '';
+        let default_settings_md5 = '';
+        let last_checked = ''; // the last checked default_settings_md5
 
         function draw_row(new_row=true) {
             let options, row_content;
@@ -204,7 +210,7 @@
             options = `<div id="div_wish_options" style="display:none">`;
             for (let i = 0; i < current_settings['wish'].length; i++) {
                 options += `
-                    <div class="wish_option" id="div_wish_option_${i}" onclick="handle_wish_options(${i});">
+                    <div class="wish_option" id="div_wish_option_${i}" onclick="handle_wish(${i});">
                         ${current_settings['wish'][i]}
                     </div>
                 `;
@@ -212,13 +218,13 @@
             options += `</div>`;
             wish_row_content = `
                 <td id="td_wish_${current_row}">
-                    <div class="div_button" id="div_wish" onclick="handle_wish_options(-1);">
+                    <div class="div_button" id="div_wish" onclick="handle_wish(-1);">
                         点击选择一个愿望 或者 直接随机→
                     </div>
                     ${options}
                 </td>
                 <td id="td_cost_${current_row}">
-                    <div class="div_button" onclick="handle_random();">点击随机抽取代价</div>
+                    <div class="div_button" onclick="handle_cost();">点击随机抽取代价</div>
                 </td>
             `;
             if (new_row) {
@@ -234,7 +240,7 @@
             }
         }
 
-        function handle_random() {
+        function handle_cost() {
             let cost_index, cost_length;
             let block_text, cost_text;
             if (current_wish_index == -1) {
@@ -285,18 +291,18 @@
             document.getElementById(`td_cost_${row_idx}`).innerHTML = cost_text;
         }
 
-        function handle_wish_options(wish_index) {
+        function handle_wish(wish_index) {
             if (wish_index == -1) {
-                handle_toggle_wish_options(true);
+                handle_wish_options_toggle(true);
             }
             else {
                 current_wish_index = wish_index;
                 document.getElementById(`div_wish`).innerHTML = current_settings['wish'][wish_index];
-                handle_toggle_wish_options();
+                handle_wish_options_toggle();
             }
         }
 
-        function handle_toggle_wish_options(is_on=false) {
+        function handle_wish_options_toggle(is_on=false) {
             let now = new Date() * 1;
             if (now - last_toggle < 100) {
                 return false;
@@ -318,15 +324,10 @@
         }
 
         function handle_md5() {
-            if (!window.localStorage) {
-                console.error("浏览器不支持localStorage");
-            }
-            else {
-                let storage = window.localStorage;
-                settings_md5 = md5(storage['data_ganbouki']);
-                document.getElementById('span_md5_0').innerHTML = settings_md5;
-                document.getElementById('span_md5_1').innerHTML = settings_md5;
-            }
+            current_settings_md5 = md5(JSON.stringify(current_settings));
+            default_settings_md5 = md5(JSON.stringify(default_settings));
+            document.getElementById('span_md5_0').innerHTML = current_settings_md5;
+            document.getElementById('span_md5_1').innerHTML = current_settings_md5;
         }
 
         function handle_td_md5() {
@@ -338,33 +339,78 @@
             }
         }
 
+        function handle_notice(code) {
+            if (!code) {
+                // 隐藏提示
+                document.getElementById('tr_notice').style.display = 'none';
+                last_checked = default_settings_md5;
+                save_settings();
+            }
+            else if (code == 1) {
+                // 初始化默认设置
+                document.getElementById('td_notice').innerHTML = `已初始化默认设置（md5：${default_settings_md5}）`;
+                document.getElementById('td_notice_button').innerHTML = `
+                    <div class="div_notice_button" onclick="handle_notice();">好的</div>
+                `;
+                document.getElementById('tr_notice').style.display = '';
+            }
+            else if (code == 100) {
+                // 发现新的默认设置
+                document.getElementById('td_notice').innerHTML = `发现新的默认设置（md5：${default_settings_md5}），要使用吗？`;
+                document.getElementById('td_notice_button').innerHTML = `
+                    <div class="div_notice_button" onclick="handle_notice();">不用</div>
+                    <div class="div_notice_button" onclick="handle_notice(101);">好的</div>
+                `;
+                document.getElementById('tr_notice').style.display = '';
+            }
+            else if (code == 101) {
+                // 使用新的默认设置
+                set_default_settings();
+                set_settings_textarea();
+                handle_md5();
+                last_checked = default_settings_md5;
+                save_settings();
+                document.getElementById('td_notice').innerHTML = `已将当前设置变更为默认设置（md5：${default_settings_md5}）`;
+                document.getElementById('td_notice_button').innerHTML = `
+                    <div class="div_notice_button" onclick="handle_notice();">好的</div>
+                `;
+            }
+        }
+
+        function set_default_settings() {
+            // 使用默认设置
+            current_settings['wish'] = default_settings['wish'];
+            current_settings['cost'] = default_settings['cost'];
+            handle_md5();
+        }
+
+        function set_settings_textarea() {
+            document.getElementById('textarea_wish').value = current_settings['wish'].join('\n');
+            document.getElementById('textarea_cost').value = current_settings['cost'].join('\n');
+        }
+
         function load_settings() {
             if (!window.localStorage) {
                 console.error("浏览器不支持localStorage");
             }
             else {
                 console.log("load_settings()");
-                let k, i, storage = window.localStorage;
+                let storage = window.localStorage;
                 if (storage['data_ganbouki']) {
                     const data = JSON.parse(storage['data_ganbouki']);
-                    for (k in default_settings) {
-                        if (data[k]) {
-                            current_settings[k] = data[k].slice();
-                        }
-                        else {
-                            // 初始化
-                            current_settings[k] = default_settings[k].slice();
-                        }
+                    current_settings['wish'] = data['wish'];
+                    current_settings['cost'] = data['cost'];
+                    handle_md5();
+                    if (current_settings_md5 != default_settings_md5 && data['last_checked'] != default_settings_md5) {
+                        handle_notice(100);
                     }
                 }
                 else {
                     // 初始化
-                    for (k in default_settings) {
-                        current_settings[k] = default_settings[k].slice();
-                    }
+                    set_default_settings();
+                    handle_notice(1);
                 }
-                document.getElementById('textarea_wish').value = current_settings['wish'].join('\n');
-                document.getElementById('textarea_cost').value = current_settings['cost'].join('\n');
+                set_settings_textarea();
             }
         }
 
@@ -375,37 +421,34 @@
             else {
                 console.log("save_settings()");
                 let i, wish, cost, storage = window.localStorage;
-                try {
-                    wish = document.getElementById('textarea_wish').value.split('\n');
-                    cost = document.getElementById('textarea_cost').value.split('\n');
-                    current_settings['wish'] = [];
-                    current_settings['cost'] = [];
-                    for (i = 0; i < wish.length; i++) {
-                        if (wish[i].trim().length > 0) {
-                            current_settings['wish'].push(wish[i].trim())
-                        }
+                wish = document.getElementById('textarea_wish').value.split('\n');
+                cost = document.getElementById('textarea_cost').value.split('\n');
+                current_settings['wish'] = [];
+                current_settings['cost'] = [];
+                for (i = 0; i < wish.length; i++) {
+                    if (wish[i].trim().length > 0) {
+                        current_settings['wish'].push(wish[i].trim())
                     }
-                    for (i = 0; i < cost.length; i++) {
-                        if (cost[i].trim().length > 0) {
-                            current_settings['cost'].push(cost[i].trim())
-                        }
+                }
+                for (i = 0; i < cost.length; i++) {
+                    if (cost[i].trim().length > 0) {
+                        current_settings['cost'].push(cost[i].trim())
                     }
-                } catch (error) {
-                    document.getElementById('tr_warning').style.display = "";
-                    document.getElementById('tr_warning').innerHTML = `<td>保存失败，请检查格式 ${error}</td>`
-                    return false;
-                    current_settings['wish'] = default_settings['wish'].slice();
-                    current_settings['cost'] = default_settings['cost'].slice();
                 }
                 document.getElementById('textarea_wish').value = current_settings['wish'].join('\n');
                 document.getElementById('textarea_cost').value = current_settings['cost'].join('\n');
-                storage['data_ganbouki'] = JSON.stringify(current_settings);
+                let data_to_save = {
+                    'wish': current_settings['wish'],
+                    'cost': current_settings['cost'],
+                    'last_checked': last_checked,
+                };
+                storage['data_ganbouki'] = JSON.stringify(data_to_save);
                 handle_md5();
                 return true;
             }
         }
 
-        function handle_settings() {
+        function handle_button_settings() {
             if (document.getElementById('table_settings').style.display == 'none') {
                 document.getElementById('table_settings').style.display = '';
                 document.getElementById('div_settings').innerHTML = "保存设置";
@@ -421,11 +464,10 @@
         }
 
         load_settings();
-        handle_md5();
         draw_row();
         document.onclick = () => {
-            handle_toggle_wish_options();
+            handle_wish_options_toggle();
         }
     </script>
 </body>
-<html>
+</html>
