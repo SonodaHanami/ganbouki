@@ -200,15 +200,7 @@
         let current_settings_md5 = '';
         let default_settings_md5 = '';
         let last_checked = ''; // the last checked default_settings_md5
-
         let default_settings;
-        fetch('default.json')
-            .then(response => response.json())
-            .then(data => default_settings = data)
-            .catch(error => {
-                console.log(error);
-                default_settings = undefined;
-            });
 
         function draw_row(new_row=true) {
             let options, row_content;
@@ -404,6 +396,17 @@
             }
             else {
                 console.log("load_settings()");
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', 'default.json', false);
+                xhr.onreadystatechange = function() {
+                    // readyState == 4说明请求已完成
+                    if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) {
+                        // 从服务器获得数据
+                        default_settings = JSON.parse(xhr.responseText);
+                        console.log('load default_settings', md5(default_settings));
+                    }
+                };
+                xhr.send(null);
                 let storage = window.localStorage;
                 if (storage['data_ganbouki']) {
                     const data = JSON.parse(storage['data_ganbouki']);
