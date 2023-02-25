@@ -114,6 +114,18 @@
             text-align: center;
         }
 
+        .div_settings_button {
+            width: 150px;
+            display: inline-block;
+            background-color: #F0F0F07F;
+            padding: 10px;
+            border-radius: 3px;
+            border-color: #000;
+            border-style: solid;
+            border-width: 1px;
+            text-align: center;
+        }
+
         #td_md5 {
             text-align: center;
             opacity: 0;
@@ -154,6 +166,11 @@
         </tr>
         <tr>
             <td colspan="2">
+                <div class="div_settings_button" onclick="handle_notice(101);">使用默认设置</div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
                 愿望和代价每行一个，空行和每行前后的空格会被自动忽略
             </td>
         </tr>
@@ -170,11 +187,13 @@
             </td>
         </tr>
     </table>
-    <table class="text" id="table_text">
+    <table class="text">
         <tr id="tr_notice" style="display:none">
             <td id="td_notice"></td>
             <td id="td_notice_button"></td>
         </tr>
+    </table>
+    <table class="text" id="table_text">
         <tr>
             <td colspan="2" id="td_md5" onclick="handle_td_md5();">
                 当前设置md5：<span id="span_md5_0">undefined</span>
@@ -355,26 +374,20 @@
                 document.getElementById('tr_notice').style.display = '';
             }
             else if (code == 100) {
-                // 发现新的默认设置
-                if (!default_settings) return false;
-                document.getElementById('td_notice').innerHTML = `发现新的默认设置（md5：${default_settings_md5}），要使用吗？`;
+                // 使用新的默认设置
+                document.getElementById('td_notice').innerHTML = `设置已更新（md5：${default_settings_md5}）`;
                 document.getElementById('td_notice_button').innerHTML = `
-                    <div class="div_notice_button" onclick="handle_notice();">不用</div>
-                    <div class="div_notice_button" onclick="handle_notice(101);">好的</div>
+                    <div class="div_notice_button" onclick="handle_notice();">好的</div>
                 `;
                 document.getElementById('tr_notice').style.display = '';
             }
             else if (code == 101) {
-                // 使用新的默认设置
                 set_default_settings();
                 set_settings_textarea();
                 handle_md5();
                 last_checked = default_settings_md5;
                 save_settings();
-                document.getElementById('td_notice').innerHTML = `已将当前设置变更为默认设置（md5：${default_settings_md5}）`;
-                document.getElementById('td_notice_button').innerHTML = `
-                    <div class="div_notice_button" onclick="handle_notice();">好的</div>
-                `;
+                handle_notice(100);
             }
         }
 
@@ -414,7 +427,15 @@
                     current_settings['cost'] = data['cost'];
                     handle_md5();
                     if (current_settings_md5 != default_settings_md5 && data['last_checked'] != default_settings_md5) {
-                        handle_notice(100);
+                        if (default_settings) {
+                            // 使用新的默认设置
+                            set_default_settings();
+                            set_settings_textarea();
+                            handle_md5();
+                            last_checked = default_settings_md5;
+                            save_settings();
+                            handle_notice(100);
+                        }
                     }
                 }
                 else {
