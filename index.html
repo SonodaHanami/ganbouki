@@ -17,6 +17,10 @@
             resize: none;
         }
 
+        table {
+            border-collapse: collapse;
+        }
+
         .text {
             width: 100%;
             text-align: left;
@@ -40,10 +44,6 @@
 
         #tr_warning {
             color: red;
-        }
-
-        #table_text {
-            border-collapse: collapse;
         }
 
         td[id^="td_wish"], td[id^="td_cost"] {
@@ -167,6 +167,7 @@
         <tr>
             <td colspan="2">
                 <div class="div_settings_button" onclick="handle_notice(101);">使用默认设置</div>
+                <div class="div_settings_button" onclick="handle_notice(102);">恢复之前设置</div>
             </td>
         </tr>
         <tr>
@@ -266,16 +267,17 @@
                 current_wish_index = Math.floor(Math.random() * Math.max(1, current_settings['wish'].length - 1)) + 1;
             }
             document.getElementById(`td_wish_${current_row}`).innerHTML = current_settings['wish'][current_wish_index];
+            block_text = question_mark.repeat(window_length);
             cost_index = Math.floor(Math.random() * current_settings['cost'].length);
             for (let i = 0; i < 10; i++) {
                 setTimeout(() => {
                     let j = Math.floor(Math.random() * current_settings['cost'].length);
-                    cost_text = current_settings['cost'][j];
+                    cost_text = current_settings['cost'][j] + block_text;
+                    cost_text = cost_text.slice(0, window_length);
                     draw_cost(current_row, cost_text);
                 }, i * 100);
             }
             cost_length = current_settings['cost'][cost_index].length;
-            block_text = question_mark.repeat(window_length);
             setTimeout(() => draw_cost(current_row, block_text), 1000);
             if (cost_length < window_length) {
                 for (let k = 1; k <= window_length; k++) {
@@ -365,29 +367,48 @@
                 last_checked = default_settings_md5;
                 save_settings();
             }
-            else if (code == 1) {
-                // 初始化默认设置
-                document.getElementById('td_notice').innerHTML = `已初始化默认设置（md5：${default_settings_md5}）`;
+            else if (code == 1 || code == 100) {
+                // 设置更新
+                set_settings_textarea();
+                handle_md5();
+                last_checked = default_settings_md5;
+                save_settings();
+                let notice_text = `设置已更新（md5：${current_settings_md5}）`
+                if (code == 1) {
+                    // 初始化默认设置
+                    notice_text = `已初始化默认设置（md5：${current_settings_md5}）`;
+                }
+                document.getElementById('td_notice').innerHTML = notice_text;
                 document.getElementById('td_notice_button').innerHTML = `
-                    <div class="div_notice_button" onclick="handle_notice();">好的</div>
-                `;
-                document.getElementById('tr_notice').style.display = '';
-            }
-            else if (code == 100) {
-                // 使用新的默认设置
-                document.getElementById('td_notice').innerHTML = `设置已更新（md5：${default_settings_md5}）`;
-                document.getElementById('td_notice_button').innerHTML = `
+                    <div class="div_notice_button" onclick="handle_button_settings();handle_notice();">查看</div>
                     <div class="div_notice_button" onclick="handle_notice();">好的</div>
                 `;
                 document.getElementById('tr_notice').style.display = '';
             }
             else if (code == 101) {
+                // 使用新的默认设置
+                save_backup_settings();
                 set_default_settings();
-                set_settings_textarea();
-                handle_md5();
-                last_checked = default_settings_md5;
-                save_settings();
                 handle_notice(100);
+            }
+            else if (code == 102) {
+                // 恢复以前的设置
+                set_backup_settings();
+                handle_notice(100);
+            }
+        }
+
+        function set_backup_settings() {
+            // 使用备份设置
+            if (!window.localStorage) {
+                console.error("浏览器不支持localStorage");
+            }
+            else {
+                let storage = window.localStorage;
+                let backup_settings = JSON.parse(storage['data_ganbouki_backup'])
+                current_settings['wish'] = backup_settings['wish'];
+                current_settings['cost'] = backup_settings['cost'];
+                handle_md5();
             }
         }
 
@@ -429,6 +450,7 @@
                     if (current_settings_md5 != default_settings_md5 && data['last_checked'] != default_settings_md5) {
                         if (default_settings) {
                             // 使用新的默认设置
+                            save_backup_settings();
                             set_default_settings();
                             set_settings_textarea();
                             handle_md5();
@@ -453,17 +475,17 @@
             }
             else {
                 console.log("save_settings()");
-                let i, wish, cost, storage = window.localStorage;
+                let wish, cost, storage = window.localStorage;
                 wish = document.getElementById('textarea_wish').value.split('\n');
                 cost = document.getElementById('textarea_cost').value.split('\n');
                 current_settings['wish'] = [];
                 current_settings['cost'] = [];
-                for (i = 0; i < wish.length; i++) {
+                for (let i = 0; i < wish.length; i++) {
                     if (wish[i].trim().length > 0) {
                         current_settings['wish'].push(wish[i].trim())
                     }
                 }
-                for (i = 0; i < cost.length; i++) {
+                for (let i = 0; i < cost.length; i++) {
                     if (cost[i].trim().length > 0) {
                         current_settings['cost'].push(cost[i].trim())
                     }
@@ -478,6 +500,17 @@
                 storage['data_ganbouki'] = JSON.stringify(data_to_save);
                 handle_md5();
                 return true;
+            }
+        }
+
+        function save_backup_settings() {
+            if (!window.localStorage) {
+                console.error("浏览器不支持localStorage");
+            }
+            else {
+                console.log("save_backup_settings()");
+                let wish, cost, storage = window.localStorage;
+                storage['data_ganbouki_backup'] = JSON.stringify(current_settings);
             }
         }
 
