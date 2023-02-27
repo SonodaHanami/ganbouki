@@ -220,7 +220,7 @@
         let current_settings_md5 = '';
         let default_settings_md5 = '';
         let last_checked = ''; // the last checked default_settings_md5
-        let default_settings;
+        let default_settings, update_message;
 
         function draw_row(new_row=true) {
             let options, row_content;
@@ -360,7 +360,7 @@
             }
         }
 
-        function handle_notice(code) {
+        function handle_notice(code, message) {
             if (!code) {
                 // 隐藏提示
                 document.getElementById('tr_notice').style.display = 'none';
@@ -373,7 +373,10 @@
                 handle_md5();
                 last_checked = default_settings_md5;
                 save_settings();
-                let notice_text = `设置已更新（md5：${current_settings_md5}）`
+                let notice_text = `设置已更新（${current_settings_md5.slice(0, 7)}）`
+                if (message) {
+                    notice_text = `设置已更新（${current_settings_md5.slice(0, 7)} ${message}）`
+                }
                 if (code == 1) {
                     // 初始化默认设置
                     notice_text = `已初始化默认设置（md5：${current_settings_md5}）`;
@@ -396,6 +399,45 @@
                 set_backup_settings();
                 handle_notice(100);
             }
+        }
+
+        function get_update_message() {
+            let xhr, repo_data, commit_data;
+            xhr = new XMLHttpRequest();
+            xhr.open('GET', 'https://api.github.com/repos/SonodaHanami/ganbouki/git/refs/heads/master', false);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) {
+                    repo_data = JSON.parse(xhr.responseText);
+                    console.log('load repo data');
+                }
+            };
+            xhr.send(null);
+
+            if (!repo_data) return false;
+            xhr = new XMLHttpRequest();
+            xhr.open('GET', repo_data['object']['url'], false);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) {
+                    commit_data = JSON.parse(xhr.responseText);
+                    update_message = commit_data['message'];
+                    console.log('load commit data', commit_data['sha'].slice(0, 7), commit_data['message']);
+                }
+            };
+            xhr.send(null);
+        }
+
+        function get_default_settings() {
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', 'default.json', false);
+            xhr.onreadystatechange = function() {
+                // readyState == 4说明请求已完成
+                if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) {
+                    // 从服务器获得数据
+                    default_settings = JSON.parse(xhr.responseText);
+                    console.log('load default_settings', md5(default_settings));
+                }
+            };
+            xhr.send(null);
         }
 
         function set_backup_settings() {
@@ -430,17 +472,7 @@
             }
             else {
                 console.log("load_settings()");
-                let xhr = new XMLHttpRequest();
-                xhr.open('GET', 'default.json', false);
-                xhr.onreadystatechange = function() {
-                    // readyState == 4说明请求已完成
-                    if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) {
-                        // 从服务器获得数据
-                        default_settings = JSON.parse(xhr.responseText);
-                        console.log('load default_settings', md5(default_settings));
-                    }
-                };
-                xhr.send(null);
+                get_default_settings();
                 let storage = window.localStorage;
                 if (storage['data_ganbouki']) {
                     const data = JSON.parse(storage['data_ganbouki']);
@@ -450,13 +482,14 @@
                     if (current_settings_md5 != default_settings_md5 && data['last_checked'] != default_settings_md5) {
                         if (default_settings) {
                             // 使用新的默认设置
+                            get_update_message();
                             save_backup_settings();
                             set_default_settings();
                             set_settings_textarea();
                             handle_md5();
                             last_checked = default_settings_md5;
                             save_settings();
-                            handle_notice(100);
+                            handle_notice(100, update_message);
                         }
                     }
                 }
