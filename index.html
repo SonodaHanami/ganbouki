@@ -272,35 +272,40 @@
             for (let i = 0; i < 10; i++) {
                 setTimeout(() => {
                     let j = Math.floor(Math.random() * current_settings['cost'].length);
-                    cost_text = current_settings['cost'][j] + block_text;
-                    cost_text = cost_text.slice(0, window_length);
-                    draw_cost(current_row, cost_text);
+                    let text = current_settings['cost'][j] + block_text;
+                    text = text.slice(0, window_length);
+                    draw_cost(current_row, text);
                 }, i * 100);
             }
-            cost_length = current_settings['cost'][cost_index].length;
+            cost_text = current_settings['cost'][cost_index];
+            // 10% extra cost
+            if (Math.random() < 0.1) {
+                cost_text += '；且立即额外抽取1个代价';
+            }
+            cost_length = cost_text.length;
             setTimeout(() => draw_cost(current_row, block_text), 1000);
             if (cost_length < window_length) {
                 for (let k = 1; k <= window_length; k++) {
                     setTimeout(() => {
-                        cost_text = '';
+                        let text = '';
                         if (k + cost_length - window_length > 0) {
-                            cost_text = current_settings['cost'][cost_index].slice(window_length - k, cost_length);
+                            text = cost_text.slice(window_length - k, cost_length);
                         }
-                        cost_text = block_text.slice(0, window_length - k) + cost_text;
-                        cost_text = cost_text.slice(0, Math.max(cost_length, window_length - k));
-                        draw_cost(current_row, cost_text);
+                        text = block_text.slice(0, window_length - k) + text;
+                        text = text.slice(0, Math.max(cost_length, window_length - k));
+                        draw_cost(current_row, text);
                     }, 1233 + k * 1000 / window_length);
                 }
             }
             else {
                 for (let k = 1; k <= cost_length; k++) {
                     setTimeout(() => {
-                        cost_text = current_settings['cost'][cost_index].slice(0, k);
+                        let text = cost_text.slice(0, k);
                         if (k < window_length) {
-                            cost_text = cost_text + block_text;
-                            cost_text = cost_text.slice(0, window_length);
+                            text = text + block_text;
+                            text = text.slice(0, window_length);
                         }
-                        draw_cost(current_row, cost_text);
+                        draw_cost(current_row, text);
                     }, 1233 + k * 1000 / cost_length);
                 }
             }
