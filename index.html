@@ -57,6 +57,10 @@
             padding-right: 10px;
         }
 
+        td[class="td_cost_not_paid"] {
+            background-color: #fedcba;
+        }
+
         #div_wish_options {
             position:absolute;
             margin-top: 15px;
@@ -244,7 +248,7 @@
                     </div>
                     ${options}
                 </td>
-                <td id="td_cost_${current_row}">
+                <td id="td_cost_${current_row}" onclick="handle_cost_paid(this.id);">
                     <div class="div_button" onclick="handle_cost();">点击随机抽取代价</div>
                 </td>
             `;
@@ -565,6 +569,16 @@
                     document.getElementById('div_settings').innerHTML = '设置';
                     draw_row(false);
                 };
+            }
+        }
+
+        function handle_cost_paid(target) {
+            console.log(target)
+            if (document.getElementById(target).classList.contains('td_cost_not_paid')) {
+                document.getElementById(target).classList.remove('td_cost_not_paid');
+            }
+            else {
+                document.getElementById(target).classList.add('td_cost_not_paid');
             }
         }
 
