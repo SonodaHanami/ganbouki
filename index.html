@@ -57,6 +57,12 @@
             padding-right: 10px;
         }
 
+        td[id^="td_cost"] span {
+            color: #FFA500;
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+
         td[class="td_cost_not_paid"] {
             background-color: #fedcba;
         }
@@ -285,8 +291,9 @@
             cost_text = current_settings['cost'][cost_index];
             // 10% extra cost
             if (Math.random() < 0.1) {
-                cost_text += '；且立即额外抽取1个代价';
+                cost_text += '；且立即额外抽取{1}个代价';
             }
+            cost_text = cost_text.replace(/{/g, '<span>').replace(/}/g, '</span>');
             cost_length = cost_text.length;
             setTimeout(() => draw_cost(current_row, block_text), 1000);
             if (cost_length < window_length) {
