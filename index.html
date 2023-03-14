@@ -291,7 +291,7 @@
             cost_text = current_settings['cost'][cost_index];
             // 10% extra cost
             if (Math.random() < 0.1) {
-                cost_text += '；且立即额外抽取{1}个代价';
+                cost_text += '；{且立即额外抽取1个代价}';
             }
             cost_text = cost_text.replace(/{/g, '<span>').replace(/}/g, '</span>');
             cost_length = cost_text.length;
@@ -451,7 +451,7 @@
                 if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) {
                     // 从服务器获得数据
                     default_settings = JSON.parse(xhr.responseText);
-                    console.log('load default_settings', md5(default_settings));
+                    console.log('load default_settings', md5(JSON.stringify(default_settings)));
                 }
             };
             xhr.send(null);
