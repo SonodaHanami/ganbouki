@@ -381,14 +381,12 @@
             if (!code) {
                 // 隐藏提示
                 document.getElementById('tr_notice').style.display = 'none';
-                last_checked = default_settings_md5;
                 save_settings();
             }
             else if (code == 1 || code == 100) {
                 // 设置更新
                 set_settings_textarea();
                 handle_md5();
-                last_checked = default_settings_md5;
                 save_settings();
                 let notice_text = `设置已更新（${current_settings_md5.slice(0, 7)}）`
                 if (message) {
@@ -496,15 +494,15 @@
                     current_settings['wish'] = data['wish'];
                     current_settings['cost'] = data['cost'];
                     handle_md5();
-                    if (current_settings_md5 != default_settings_md5 && data['last_checked'] != default_settings_md5) {
-                        if (default_settings) {
+                    if (default_settings) {
+                        last_checked = default_settings_md5;
+                        if (current_settings_md5 != default_settings_md5 && data['last_checked'] != default_settings_md5) {
                             // 使用新的默认设置
                             get_update_message();
                             save_backup_settings();
                             set_default_settings();
                             set_settings_textarea();
                             handle_md5();
-                            last_checked = default_settings_md5;
                             save_settings();
                             handle_notice(100, update_message);
                         }
@@ -513,6 +511,7 @@
                 else {
                     // 初始化
                     set_default_settings();
+                    last_checked = default_settings_md5;
                     handle_notice(1);
                 }
                 set_settings_textarea();
