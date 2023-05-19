@@ -1,4 +1,5 @@
 <html>
+
 <head>
     <title>随机肉鸽许愿机</title>
     <style>
@@ -11,26 +12,6 @@
             text-align: center;
         }
 
-        #div_overlay_container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 3044248;
-            background-color: #000000EE;
-        }
-
-        .div_container {
-            margin-top: 20px;
-            margin-left: 20px;
-            margin-right: 20px;
-        }
-
-        a:link, a:visited {
-            color: #FFA500;
-        }
-
         textarea {
             width: 100%;
             resize: none;
@@ -40,29 +21,25 @@
             border-collapse: collapse;
         }
 
-        .table_text {
+        .text {
             width: 100%;
             text-align: left;
             table-layout: fixed;
         }
 
-        .table_text tr {
+        .text tr {
             height: 75px;
         }
 
-        .table_text th {
+        .text th {
             font-size: 2em;
             padding: 10px;
         }
 
-        .table_text td {
+        .text td {
             height: 75px;
             width: 50%;
             font-size: 1.5em;
-        }
-
-        #table_cost {
-            color: #FFF
         }
 
         #tr_warning {
@@ -78,10 +55,6 @@
             border-right-style: dashed;
             padding-left: 10px;
             padding-right: 10px;
-        }
-
-        #td_cost_result {
-            border-width: 0px;
         }
 
         td[id^="td_cost"] span {
@@ -151,7 +124,7 @@
             text-align: center;
         }
 
-        .div_tag_button, .div_settings_button {
+        .div_settings_button {
             width: 150px;
             display: inline-block;
             background-color: #F0F0F07F;
@@ -161,20 +134,6 @@
             border-style: solid;
             border-width: 1px;
             text-align: center;
-        }
-
-        .div_tag_button:hover {
-            outline-color: #00AAFF;
-            outline-style: solid;
-            outline-width: 3px;
-        }
-
-        .div_tag_button_selected {
-            background-color: #00AAFF;
-        }
-
-        .div_tag_button_useless {
-            background-color: #bb5a5a;
         }
 
         #td_md5 {
@@ -199,47 +158,7 @@
 </head>
 
 <body>
-    <div id="div_overlay_container" style="display:none">
-        <div class="div_container">
-            <table class="table_text" id="table_cost">
-                <tr>
-                    <td colspan="2">
-                        <div class="div_button" onclick="handle_overlay();">关闭</div>
-                    </td>
-                </tr>
-                <tr></tr>
-                <tr>
-                    <td colspan="2">
-                        代价需求（最多3项）
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <div class="div_tag_button" id='div_tag_0' onclick="handle_tag(0);">代价需求1</div>
-                        <div class="div_tag_button" id='div_tag_1' onclick="handle_tag(1);">代价需求2</div>
-                        <div class="div_tag_button" id='div_tag_2' onclick="handle_tag(2);">代价需求3</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <div class="div_tag_button" id='div_tag_3' onclick="handle_tag(3);">代价需求4</div>
-                        <div class="div_tag_button" id='div_tag_4' onclick="handle_tag(4);">代价需求5</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2" id="td_cost_result">
-                        这里显示抽出的代价
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <div class="div_button" id="div_cost_OK">确认</div>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </div>
-    <table class="table_text">
+    <table class="text">
         <tr>
             <td>
                 <div class="div_button" id="div_settings" onclick="handle_button_settings();">设置</div>
@@ -249,57 +168,47 @@
             </td>
         </tr>
     </table>
-    <table class="table_text" id="table_settings" style="display:none">
+    <table class="text" id="table_settings" style="display:none">
         <tr id="tr_warning" style="display:none"></tr>
-        <tr style="display:none">
+        <tr>
             <td colspan="2">
                 当前设置md5：<span id="span_md5_1">undefined</span>
             </td>
         </tr>
-        <tr style="display:none">
+        <tr>
             <td colspan="2">
                 <div class="div_settings_button" onclick="handle_notice(101);">使用默认设置</div>
                 <div class="div_settings_button" onclick="handle_notice(102);">恢复之前设置</div>
             </td>
         </tr>
         <tr>
-            <td>
-                <a href="./old.html">打开标准版本</a>
+            <td colspan="2">
+                愿望和代价每行一个，空行和每行前后的空格会被自动忽略
             </td>
         </tr>
         <tr>
-            <td colspan="2">
-                测试版本暂时不能修改设置喵，但是可以 <a href="./beta.json">查看愿望和代价</a>
-            </td>
-        </tr>
-        <tr style="display:none">
             <td colspan="2">
                 愿望：
                 <textarea id="textarea_wish" rows="10"></textarea>
             </td>
         </tr>
-        <tr style="display:none">
+        <tr>
             <td colspan="2">
                 代价：
                 <textarea id="textarea_cost" rows="10"></textarea>
             </td>
         </tr>
     </table>
-    <table class="table_text">
+    <table class="text">
         <tr id="tr_notice" style="display:none">
             <td id="td_notice"></td>
             <td id="td_notice_button"></td>
         </tr>
     </table>
-    <table class="table_text" id="table_main">
-        <tr style="display:none">
+    <table class="text" id="table_text">
+        <tr>
             <td colspan="2" id="td_md5" onclick="handle_td_md5();">
                 当前设置md5：<span id="span_md5_0">undefined</span>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2" id="td_notice_2">
-                这是测试版本，可以从设置返回标准版本喵
             </td>
         </tr>
         <tr>
@@ -323,128 +232,6 @@
         let default_settings_md5 = '';
         let last_checked = ''; // the last checked default_settings_md5
         let default_settings, update_message;
-        let current_cost_pool = [];
-        let current_tag_pool = [];
-        let current_selected_tag_indices = new Set();
-        let flag_handle_cost_done = false;
-
-        function handle_cost() {
-            // 禁用按钮
-            document.getElementById('div_cost_OK').innerHTML = '请稍候';
-            document.getElementById('div_cost_OK').onclick = undefined;
-
-            // 应该首先搜索完全包含所选标签的代价
-            let current_selected_tags = [];
-            let cost_with_selected_tags = [];
-            let cost_result;
-            console.log('current_tag_pool', current_tag_pool)
-            for (let i = 0; i < current_tag_pool.length; i++) {
-                if (current_selected_tag_indices.has(i)) {
-                    current_selected_tags.push(current_tag_pool[i])
-                }
-            }
-            console.log('current_selected_tags', current_selected_tags)
-            for (let i = 0; i < current_cost_pool.length; i++) {
-                if (isSuperset(new Set(current_cost_pool[i]['tag']), new Set(current_selected_tags))) {
-                    cost_with_selected_tags.push(current_cost_pool[i]);
-                }
-            }
-            if (cost_with_selected_tags.length > 0) {
-                cost_result = sample(cost_with_selected_tags, 1)[0];
-                console.log('代价：', cost_result['text']);
-                console.log('标签：', cost_result['tag']);
-            }
-            else {
-                // 应该去除部分标签重新搜索，之后优化
-                // 只要包含其中一个标签就会被选中
-                for (let i = 0; i < current_cost_pool.length; i++) {
-                    let flag = false;
-                    for (let j = 0; j < current_selected_tags.length; j++) {
-                        if (current_cost_pool[i]['tag'].includes(current_selected_tags[j])) {
-                            flag = true;
-                        }
-                    }
-                    if (flag) {
-                        cost_with_selected_tags.push(current_cost_pool[i]);
-                    }
-                }
-                cost_result = sample(cost_with_selected_tags, 1)[0];
-                console.log(cost_result);
-                console.log('代价：', cost_result['text']);
-                console.log('标签：', cost_result['tag']);
-                // 应该还有全部划掉的情况，之后优化
-            }
-
-            // 实际有效的标签
-            tag_useful = intersection(new Set(cost_result['tag']), new Set(current_selected_tags));
-            console.log('tag_useful', tag_useful);
-
-            // 没用上的标签，划掉
-            tag_useless = difference(new Set(current_selected_tags), new Set(cost_result['tag']));
-            console.log('tag_useless', tag_useless);
-            for (let i = 0; i < 5; i++) {
-                if (current_selected_tag_indices.has(i) && tag_useless.has(document.getElementById(`div_tag_${i}`).innerHTML)) {
-                    document.getElementById(`div_tag_${i}`).classList.add('div_tag_button_useless');
-                }
-            }
-
-            let cost_length;
-            let block_text, cost_text;
-            if (current_wish_index == -1) {
-                current_wish_index = Math.floor(Math.random() * Math.max(1, current_settings['wish'].length - 1)) + 1;
-            }
-            document.getElementById(`td_wish_${current_row}`).innerHTML = current_settings['wish'][current_wish_index];
-            block_text = question_mark.repeat(window_length);
-            for (let i = 0; i < 10; i++) {
-                setTimeout(() => {
-                    let j = Math.floor(Math.random() * current_settings['cost'].length);
-                    let text = current_settings['cost'][j]['text'] + block_text;
-                    text = text.slice(0, window_length);
-                    draw_cost(text);
-                }, i * 100);
-            }
-            cost_text = cost_result['text'];
-            // 10% extra cost
-            // if (Math.random() < 0.1) {
-            //     cost_text += '；{且立即额外抽取1个代价}';
-            // }
-            cost_text = cost_text.replace(/{/g, '<span>').replace(/}/g, '</span>');
-            cost_length = cost_text.length;
-            setTimeout(() => draw_cost(block_text), 1000);
-            if (cost_length < window_length) {
-                for (let k = 1; k <= window_length; k++) {
-                    setTimeout(() => {
-                        let text = '';
-                        if (k + cost_length - window_length > 0) {
-                            text = cost_text.slice(window_length - k, cost_length);
-                        }
-                        text = block_text.slice(0, window_length - k) + text;
-                        text = text.slice(0, Math.max(cost_length, window_length - k));
-                        draw_cost(text);
-                    }, 1233 + k * 1000 / window_length);
-                }
-            }
-            else {
-                for (let k = 1; k <= cost_length; k++) {
-                    setTimeout(() => {
-                        let text = cost_text.slice(0, k);
-                        if (k < window_length) {
-                            text = text + block_text;
-                            text = text.slice(0, window_length);
-                        }
-                        draw_cost(text);
-                    }, 1233 + k * 1000 / cost_length);
-                }
-            }
-
-            setTimeout(() => {
-                flag_handle_cost_done = true;
-                document.getElementById('div_cost_OK').innerHTML = '关闭';
-                document.getElementById('div_cost_OK').onclick = handle_overlay;
-                document.getElementById(`td_cost_${current_row}`).innerHTML = cost_text;
-                draw_row();
-            }, 2333);
-        }
 
         function draw_row(new_row=true) {
             let options, row_content;
@@ -463,16 +250,16 @@
             wish_row_content = `
                 <td id="td_wish_${current_row}">
                     <div class="div_button" id="div_wish" onclick="handle_wish(-1);">
-                        点击选择一个愿望 或者 直接抽取→
+                        点击选择一个愿望 或者 直接随机→
                     </div>
                     ${options}
                 </td>
                 <td id="td_cost_${current_row}" onclick="handle_cost_paid(this.id);">
-                    <div class="div_button" onclick="handle_overlay();">开始抽取代价</div>
+                    <div class="div_button" onclick="handle_cost();">点击随机抽取代价</div>
                 </td>
             `;
             if (new_row) {
-                document.getElementById("table_main").innerHTML += `
+                document.getElementById("table_text").innerHTML += `
                     <tr id="tr_${current_row}">
                         ${wish_row_content}
                     </tr>
@@ -484,65 +271,62 @@
             }
         }
 
-        function handle_tag(tag_id) {
-            let div_tag = `div_tag_${tag_id}`
-            if (current_selected_tag_indices.has(tag_id)) {
-                document.getElementById(div_tag).classList.remove('div_tag_button_selected');
-                current_selected_tag_indices.delete(tag_id)
+        function handle_cost() {
+            let cost_index, cost_length;
+            let block_text, cost_text;
+            if (current_wish_index == -1) {
+                current_wish_index = Math.floor(Math.random() * Math.max(1, current_settings['wish'].length - 1)) + 1;
             }
-            else {
-                document.getElementById(div_tag).classList.add('div_tag_button_selected');
-                current_selected_tag_indices.add(tag_id)
+            document.getElementById(`td_wish_${current_row}`).innerHTML = current_settings['wish'][current_wish_index];
+            block_text = question_mark.repeat(window_length);
+            cost_index = Math.floor(Math.random() * current_settings['cost'].length);
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    let j = Math.floor(Math.random() * current_settings['cost'].length);
+                    let text = current_settings['cost'][j] + block_text;
+                    text = text.slice(0, window_length);
+                    draw_cost(current_row, text);
+                }, i * 100);
             }
-        }
-
-        function get_tag_set(cost_list) {
-            let tag_set = new Set();
-            for (let i = 0; i < cost_list.length; i++) {
-                for (let j = 0; j < cost_list[i]['tag'].length; j++){
-                    tag_set.add(cost_list[i]['tag'][j]);
+            cost_text = current_settings['cost'][cost_index];
+            // 10% extra cost
+            if (Math.random() < 0.1) {
+                cost_text += '；{且立即额外抽取1个代价}';
+            }
+            cost_text = cost_text.replace(/{/g, '<span>').replace(/}/g, '</span>');
+            cost_length = cost_text.length;
+            setTimeout(() => draw_cost(current_row, block_text), 1000);
+            if (cost_length < window_length) {
+                for (let k = 1; k <= window_length; k++) {
+                    setTimeout(() => {
+                        let text = '';
+                        if (k + cost_length - window_length > 0) {
+                            text = cost_text.slice(window_length - k, cost_length);
+                        }
+                        text = block_text.slice(0, window_length - k) + text;
+                        text = text.slice(0, Math.max(cost_length, window_length - k));
+                        draw_cost(current_row, text);
+                    }, 1233 + k * 1000 / window_length);
                 }
             }
-            return tag_set;
+            else {
+                for (let k = 1; k <= cost_length; k++) {
+                    setTimeout(() => {
+                        let text = cost_text.slice(0, k);
+                        if (k < window_length) {
+                            text = text + block_text;
+                            text = text.slice(0, window_length);
+                        }
+                        draw_cost(current_row, text);
+                    }, 1233 + k * 1000 / cost_length);
+                }
+            }
+
+            setTimeout(() => draw_row(), 2333);
         }
 
-        function reset_cost_tag_pool() {
-            // 随机选出10条代价，标签总数小于5时，重新随机选择代价，直到标签总数大于等于5
-            let tag_set = new Set();
-            let cnt = 0;
-            while (tag_set.size < 5 && cnt < 10) {
-                cnt += 1;
-                current_cost_pool = sample(current_settings['cost'], 10);
-                tag_set = get_tag_set(current_cost_pool);
-                console.log(current_cost_pool);
-                console.log(tag_set);
-            }
-            // 首先随机选1条代价，随机选择2至3个标签，但最多不超过它的标签总数
-            let cost_1 = current_cost_pool[Math.floor(Math.random() * current_cost_pool.length)];
-            let tag_1_cnt = Math.min(cost_1['tag'].length, Math.floor(Math.random() * 2) + 2);
-            let tag_1 = sample(cost_1['tag'], tag_1_cnt);
-            console.log(cost_1['text'], cost_1['tag'], tag_1_cnt, tag_1);
-            // 从所有标签集合中移除已被选择的标签，再随机选择标签凑齐5个
-            let tag_set_rest = Array.from(difference(tag_set, new Set(tag_1)));
-            current_tag_pool = shuffle(tag_1.concat(sample(tag_set_rest, 5 - tag_1_cnt)));
-            console.log(current_tag_pool);
-            for (let i = 0; i < 5; i++) {
-                document.getElementById(`div_tag_${i}`).innerHTML = current_tag_pool[i]
-            }
-
-            // 初始化
-            // reset_overlay()
-            flag_handle_cost_done = false;
-            current_selected_tag_indices.clear();
-            for (let i = 0; i < 5; i++) {
-                document.getElementById(`div_tag_${i}`).classList.remove('div_tag_button_selected');
-                document.getElementById(`div_tag_${i}`).classList.remove('div_tag_button_useless');
-            }
-            document.getElementById('td_cost_result').innerHTML = '这里显示抽出的代价'
-        }
-
-        function draw_cost(cost_text) {
-            document.getElementById(`td_cost_result`).innerHTML = cost_text;
+        function draw_cost(row_idx, cost_text) {
+            document.getElementById(`td_cost_${row_idx}`).innerHTML = cost_text;
         }
 
         function handle_wish(wish_index) {
@@ -597,13 +381,13 @@
             if (!code) {
                 // 隐藏提示
                 document.getElementById('tr_notice').style.display = 'none';
-                // save_settings();
+                save_settings();
             }
             else if (code == 1 || code == 100) {
                 // 设置更新
                 set_settings_textarea();
                 handle_md5();
-                // save_settings();
+                save_settings();
                 let notice_text = `设置已更新（${current_settings_md5.slice(0, 7)}）`
                 if (message) {
                     notice_text = `设置已更新（${current_settings_md5.slice(0, 7)} ${message}）`
@@ -659,7 +443,7 @@
 
         function get_default_settings() {
             let xhr = new XMLHttpRequest();
-            xhr.open('GET', 'beta.json', false);
+            xhr.open('GET', 'default.json', false);
             xhr.onreadystatechange = function() {
                 // readyState == 4说明请求已完成
                 if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) {
@@ -698,20 +482,43 @@
         }
 
         function load_settings() {
-            get_default_settings();
-            get_update_message();
-            if (default_settings) {
-                // 使用新的默认设置
-                set_default_settings();
+            if (!window.localStorage) {
+                console.error("浏览器不支持localStorage");
             }
             else {
-                console.error("初始化设置失败，请刷新重试");
-                document.getElementById('td_notice_2').innerHTML = "初始化设置失败，请刷新重试";
+                console.log("load_settings()");
+                get_default_settings();
+                let storage = window.localStorage;
+                if (storage['data_ganbouki']) {
+                    const data = JSON.parse(storage['data_ganbouki']);
+                    current_settings['wish'] = data['wish'];
+                    current_settings['cost'] = data['cost'];
+                    handle_md5();
+                    if (default_settings) {
+                        last_checked = default_settings_md5;
+                        if (current_settings_md5 != default_settings_md5 && data['last_checked'] != default_settings_md5) {
+                            // 使用新的默认设置
+                            get_update_message();
+                            save_backup_settings();
+                            set_default_settings();
+                            set_settings_textarea();
+                            handle_md5();
+                            save_settings();
+                            handle_notice(100, update_message);
+                        }
+                    }
+                }
+                else {
+                    // 初始化
+                    set_default_settings();
+                    last_checked = default_settings_md5;
+                    handle_notice(1);
+                }
+                set_settings_textarea();
             }
         }
 
         function save_settings() {
-            return false;
             if (!window.localStorage) {
                 console.error("浏览器不支持localStorage");
             }
@@ -762,27 +569,12 @@
                 document.getElementById('div_settings').innerHTML = "保存设置";
             }
             else {
-                // if (save_settings()) {
-                if (true) {
+                if (save_settings()) {
                     document.getElementById('tr_warning').style.display = 'none';
                     document.getElementById('table_settings').style.display = 'none';
                     document.getElementById('div_settings').innerHTML = '设置';
                     draw_row(false);
                 };
-            }
-        }
-
-        function handle_overlay() {
-            if (document.getElementById('div_overlay_container').style.display == 'none') {
-                document.getElementById('div_overlay_container').style.display = '';
-                document.getElementById('div_cost_OK').onclick = handle_cost;
-                if (flag_handle_cost_done) {
-                    reset_cost_tag_pool();
-                }
-            }
-            else {
-                document.getElementById('div_overlay_container').style.display = 'none';
-                document.getElementById('div_cost_OK').onclick = undefined;
             }
         }
 
@@ -796,96 +588,11 @@
             }
         }
 
-        // 超集，set是否为subset的超集，即subset是否为set的子集
-        function isSuperset(set, subset) {
-            for (let elem of subset) {
-                if (!set.has(elem)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        // 并集，合并去重
-        function union(setA, setB) {
-            let _union = new Set(setA);
-            for (let elem of setB) {
-                _union.add(elem);
-            }
-            return _union;
-        }
-
-        // 交集，同时属于A和B的元素的集合
-        function intersection(setA, setB) {
-            let _intersection = new Set();
-            for (let elem of setB) {
-                if (setA.has(elem)) {
-                    _intersection.add(elem);
-                }
-            }
-            return _intersection;
-        }
-
-        // 对称差集，不同时属于A或B的元素的集合
-        function symmetricDifference(setA, setB) {
-            let _difference = new Set(setA);
-            for (let elem of setB) {
-                if (_difference.has(elem)) {
-                    _difference.delete(elem);
-                } else {
-                    _difference.add(elem);
-                }
-            }
-            return _difference;
-        }
-
-        // 差集，属于A且不属于B的元素的集合
-        function difference(setA, setB) {
-            let _difference = new Set(setA);
-            for (let elem of setB) {
-                _difference.delete(elem);
-            }
-            return _difference;
-        }
-
-        // 从list中随机取出size个元素
-        function sample(list, size) {
-            if (size >= list.length) {
-                return list;
-            }
-            let result = [];
-            let indices = new Set();
-            while (indices.size < size) {
-                indices.add(Math.floor(Math.random() * list.length));
-            }
-            indices.forEach(index => {
-                result.push(list[index])
-            });
-            return result;
-        }
-
-        // 随机打乱数组
-        function shuffle(array) {
-            let currentIndex = array.length,  randomIndex;
-            // While there remain elements to shuffle.
-            while (currentIndex != 0) {
-                // Pick a remaining element.
-                randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex--;
-                // And swap it with the current element.
-                [array[currentIndex], array[randomIndex]] = [
-                array[randomIndex], array[currentIndex]];
-            }
-            return array;
-        }
-
         load_settings();
         draw_row();
-        reset_cost_tag_pool();
         document.onclick = () => {
             handle_wish_options_toggle();
         }
-        handle_td_md5();
     </script>
 </body>
 </html>
