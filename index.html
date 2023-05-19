@@ -62,7 +62,7 @@
         }
 
         #table_cost {
-            color: #FFF
+            color: #FFF;
         }
 
         #tr_warning {
@@ -337,10 +337,10 @@
             let current_selected_tags = [];
             let cost_with_selected_tags = [];
             let cost_result;
-            console.log('current_tag_pool', current_tag_pool)
+            console.log('current_tag_pool', current_tag_pool);
             for (let i = 0; i < current_tag_pool.length; i++) {
                 if (current_selected_tag_indices.has(i)) {
-                    current_selected_tags.push(current_tag_pool[i])
+                    current_selected_tags.push(current_tag_pool[i]);
                 }
             }
             console.log('current_selected_tags', current_selected_tags)
@@ -485,14 +485,16 @@
         }
 
         function handle_tag(tag_id) {
-            let div_tag = `div_tag_${tag_id}`
+            let div_tag = `div_tag_${tag_id}`;
             if (current_selected_tag_indices.has(tag_id)) {
                 document.getElementById(div_tag).classList.remove('div_tag_button_selected');
-                current_selected_tag_indices.delete(tag_id)
+                current_selected_tag_indices.delete(tag_id);
             }
             else {
-                document.getElementById(div_tag).classList.add('div_tag_button_selected');
-                current_selected_tag_indices.add(tag_id)
+                if (current_selected_tag_indices.size < 3) {
+                    document.getElementById(div_tag).classList.add('div_tag_button_selected');
+                    current_selected_tag_indices.add(tag_id);
+                }
             }
         }
 
@@ -527,7 +529,7 @@
             current_tag_pool = shuffle(tag_1.concat(sample(tag_set_rest, 5 - tag_1_cnt)));
             console.log(current_tag_pool);
             for (let i = 0; i < 5; i++) {
-                document.getElementById(`div_tag_${i}`).innerHTML = current_tag_pool[i]
+                document.getElementById(`div_tag_${i}`).innerHTML = current_tag_pool[i];
             }
 
             // 初始化
@@ -538,7 +540,7 @@
                 document.getElementById(`div_tag_${i}`).classList.remove('div_tag_button_selected');
                 document.getElementById(`div_tag_${i}`).classList.remove('div_tag_button_useless');
             }
-            document.getElementById('td_cost_result').innerHTML = '这里显示抽出的代价'
+            document.getElementById('td_cost_result').innerHTML = '这里显示抽出的代价';
         }
 
         function draw_cost(cost_text) {
@@ -604,9 +606,9 @@
                 set_settings_textarea();
                 handle_md5();
                 // save_settings();
-                let notice_text = `设置已更新（${current_settings_md5.slice(0, 7)}）`
+                let notice_text = `设置已更新（${current_settings_md5.slice(0, 7)}）`;
                 if (message) {
-                    notice_text = `设置已更新（${current_settings_md5.slice(0, 7)} ${message}）`
+                    notice_text = `设置已更新（${current_settings_md5.slice(0, 7)} ${message}）`;
                 }
                 if (code == 1) {
                     // 初始化默认设置
@@ -678,7 +680,7 @@
             }
             else {
                 let storage = window.localStorage;
-                let backup_settings = JSON.parse(storage['data_ganbouki_backup'])
+                let backup_settings = JSON.parse(storage['data_ganbouki_backup']);
                 current_settings['wish'] = backup_settings['wish'];
                 current_settings['cost'] = backup_settings['cost'];
                 handle_md5();
@@ -724,12 +726,12 @@
                 current_settings['cost'] = [];
                 for (let i = 0; i < wish.length; i++) {
                     if (wish[i].trim().length > 0) {
-                        current_settings['wish'].push(wish[i].trim())
+                        current_settings['wish'].push(wish[i].trim());
                     }
                 }
                 for (let i = 0; i < cost.length; i++) {
                     if (cost[i].trim().length > 0) {
-                        current_settings['cost'].push(cost[i].trim())
+                        current_settings['cost'].push(cost[i].trim());
                     }
                 }
                 document.getElementById('textarea_wish').value = current_settings['wish'].join('\n');
@@ -787,7 +789,7 @@
         }
 
         function handle_cost_paid(target) {
-            console.log(target)
+            console.log(target);
             if (document.getElementById(target).classList.contains('td_cost_not_paid')) {
                 document.getElementById(target).classList.remove('td_cost_not_paid');
             }
@@ -859,7 +861,7 @@
                 indices.add(Math.floor(Math.random() * list.length));
             }
             indices.forEach(index => {
-                result.push(list[index])
+                result.push(list[index]);
             });
             return result;
         }
@@ -873,8 +875,7 @@
                 randomIndex = Math.floor(Math.random() * currentIndex);
                 currentIndex--;
                 // And swap it with the current element.
-                [array[currentIndex], array[randomIndex]] = [
-                array[randomIndex], array[currentIndex]];
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
             }
             return array;
         }
