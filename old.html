@@ -419,7 +419,7 @@
         function get_update_message() {
             let xhr, repo_data, commit_data;
             xhr = new XMLHttpRequest();
-            xhr.open('GET', 'https://api.github.com/repos/SonodaHanami/ganbouki/git/refs/heads/master', false);
+            xhr.open('GET', 'https://api.github.com/repos/SonodaHanami/ganbouki/git/refs/heads/dev', false);
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) {
                     repo_data = JSON.parse(xhr.responseText);
