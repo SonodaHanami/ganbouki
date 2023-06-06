@@ -232,6 +232,7 @@
         let default_settings_md5 = '';
         let last_checked = ''; // the last checked default_settings_md5
         let default_settings, update_message;
+        let extra_cost_count = 0;
 
         function draw_row(new_row=true) {
             let options, row_content;
@@ -290,8 +291,9 @@
             }
             cost_text = current_settings['cost'][cost_index];
             // 10% extra cost
-            if (Math.random() < 0.1) {
-                cost_text += '；{且立即额外抽取1个代价}';
+            if (Math.random() < 0.2 && extra_cost_count < 1) {
+                cost_text += '<br>{且立即额外抽取1个代价}';
+                extra_cost_count += 1;
             }
             cost_text = cost_text.replace(/{/g, '<span>').replace(/}/g, '</span>');
             cost_length = cost_text.length;
