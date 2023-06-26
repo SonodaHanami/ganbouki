@@ -169,12 +169,20 @@
             outline-width: 3px;
         }
 
-        .div_tag_button_selected {
+        .div_tag_button_enabled {
             background-color: #00AAFF;
         }
 
-        .div_tag_button_useless {
+        .div_tag_button_enabled_useless {
             background-color: #bb5a5a;
+        }
+
+        .div_tag_button_disabled {
+            background-color: #ebeb16;
+        }
+
+        .div_tag_button_disabled_useless {
+            background-color: #76cb8b;
         }
 
         #td_md5 {
@@ -209,7 +217,7 @@
                 </tr>
                 <tr></tr>
                 <tr>
-                    <td colspan="2">
+                    <td colspan="2" id="td_tag_comment">
                         代价需求（最多3项）
                     </td>
                 </tr>
@@ -224,6 +232,14 @@
                     <td colspan="2">
                         <div class="div_tag_button" id='div_tag_3' onclick="handle_tag(3);">代价需求4</div>
                         <div class="div_tag_button" id='div_tag_4' onclick="handle_tag(4);">代价需求5</div>
+                        <div class="div_tag_button" id='div_tag_5' onclick="handle_tag(5);" style="display: none;">代价需求6</div>
+                    </td>
+                </tr>
+                <tr id="tr_tag_row_3" style="display: none;">
+                    <td colspan="2">
+                        <div class="div_tag_button" id='div_tag_6' onclick="handle_tag(6);">代价需求7</div>
+                        <div class="div_tag_button" id='div_tag_7' onclick="handle_tag(7);">代价需求8</div>
+                        <div class="div_tag_button" id='div_tag_8' onclick="handle_tag(8);">代价需求9</div>
                     </td>
                 </tr>
                 <tr>
@@ -299,7 +315,7 @@
         </tr>
         <tr>
             <td colspan="2" id="td_notice_2">
-                这是测试版本，可以从设置返回标准版本喵
+                这是<span style="color:#ebeb16">反向公开招募</span>测试版本，可以从设置返回标准版本喵
             </td>
         </tr>
         <tr>
@@ -323,6 +339,7 @@
         let default_settings_md5 = '';
         let last_checked = ''; // the last checked default_settings_md5
         let default_settings, update_message;
+        let cost_mode = 1;
         let current_cost_pool = [];
         let current_tag_pool = [];
         let current_selected_tag_indices = new Set();
@@ -333,65 +350,147 @@
             document.getElementById('div_cost_OK').innerHTML = '请稍候';
             document.getElementById('div_cost_OK').onclick = undefined;
 
-            // 应该首先搜索完全包含所选标签的代价
-            let current_selected_tags = [];
-            let cost_with_selected_tags = [];
             let cost_result;
-            console.log('current_tag_pool', current_tag_pool);
-            for (let i = 0; i < current_tag_pool.length; i++) {
-                if (current_selected_tag_indices.has(i)) {
-                    current_selected_tags.push(current_tag_pool[i]);
+            if (cost_mode == 0) {
+                // 公开招募模式，选择想要的标签筛选代价
+                // 首先搜索完全包含所选标签的代价
+                let current_selected_tags = [];
+                let cost_with_selected_tags = [];
+                console.log('当前标签池', current_tag_pool);
+                for (let i = 0; i < current_tag_pool.length; i++) {
+                    if (current_selected_tag_indices.has(i)) {
+                        current_selected_tags.push(current_tag_pool[i]);
+                    }
                 }
-            }
-            console.log('current_selected_tags', current_selected_tags)
-            for (let i = 0; i < current_cost_pool.length; i++) {
-                if (isSuperset(new Set(current_cost_pool[i]['tag']), new Set(current_selected_tags))) {
-                    cost_with_selected_tags.push(current_cost_pool[i]);
+                console.log('当前选中标签', current_selected_tags);
+                for (let i = 0; i < current_cost_pool.length; i++) {
+                    // 标签集合为所选标签集合的超集的代价就会被选中
+                    if (isSuperset(new Set(current_cost_pool[i]['tag']), new Set(current_selected_tags))) {
+                        cost_with_selected_tags.push(current_cost_pool[i]);
+                    }
                 }
-            }
-            if (cost_with_selected_tags.length > 0) {
-                cost_result = sample(cost_with_selected_tags, 1)[0];
-                console.log('代价：', cost_result['text']);
-                console.log('标签：', cost_result['tag']);
-            }
-            else {
-                // 代价池中没有任何一条代价完全满足所选标签的情况
-                if (Math.random() < 0.8) {
-                    // 80%的概率仅划掉部分所选标签
-                    // 标签与所选标签的交集不为空就会被选中
+                if (cost_with_selected_tags.length > 0) {
+                    console.log(`共有${cost_with_selected_tags.length}条代价符合条件，从中随机选择一条`);
+                    console.log(cost_with_selected_tags);
+                    cost_result = sample(cost_with_selected_tags, 1)[0];
+                }
+                else {
+                    // 代价池中没有任何一条代价完全满足所选标签的情况
+                    // （80%的概率）首先仅划掉部分所选标签
+                    // 标签集合与所选标签集合的交集不为空的代价就会被选中
                     for (let i = 0; i < current_cost_pool.length; i++) {
                         if (intersection(new Set(current_cost_pool[i]['tag']), new Set(current_selected_tags)).size > 0) {
                             cost_with_selected_tags.push(current_cost_pool[i]);
                         }
                     }
-                    // 从中随机选择一条
+                    console.log(`共有${cost_with_selected_tags.length}条代价符合条件，从中随机选择一条`);
+                    console.log(cost_with_selected_tags);
                     cost_result = sample(cost_with_selected_tags, 1)[0];
-                    console.log(cost_result);
-                    console.log('代价：', cost_result['text']);
-                    console.log('标签：', cost_result['tag']);
+                    if (Math.random() < 0.2) {
+                        // 20%的概率划掉所有标签
+                        // 直接从代价中随机选择一条
+                        // 可能出现标签被划掉了但是随机选择后实际有效，之后也显示为有效的情况，不过没有关系
+                        console.log(`全 划 了，从全部代价中随机选择一条`);
+                        cost_result = sample(current_cost_pool, 1)[0];
+                    }
                 }
-                else {
-                    // 20%的概率划掉所有标签
-                    // 直接从代价中随机选择一条
-                    // 可能出现标签被划掉了但是随机选择后实际有效，之后也显示为有效的情况，不过没有关系
-                    console.log('全 划 了');
-                    cost_result = sample(current_cost_pool, 1)[0];
-                    console.log(cost_result);
-                    console.log('代价：', cost_result['text']);
-                    console.log('标签：', cost_result['tag']);
+                console.log('代价：', cost_result['text']);
+                console.log('标签：', cost_result['tag']);
+
+                let result_tag_set = new Set(cost_result['tag']);
+                // 实际有效的标签
+                let tag_useful_set = intersection(new Set(current_selected_tags), result_tag_set);
+                console.log('tag_useful_set', tag_useful_set);
+
+                // 没用上的标签，划掉
+                let tag_useless_set = difference(new Set(current_selected_tags), result_tag_set);
+                console.log('tag_useless_set', tag_useless_set);
+
+                // 把标签涂上对应的颜色
+                for (let i = 0; i < 5; i++) {
+                    if (tag_useless_set.has(document.getElementById(`div_tag_${i}`).innerHTML)) {
+                        document.getElementById(`div_tag_${i}`).classList.remove('div_tag_button_enabled');
+                        document.getElementById(`div_tag_${i}`).classList.add('div_tag_button_enabled_useless');
+                    }
                 }
             }
+            else if (cost_mode == 1) {
+                // 反向公开招募模式，选择（禁用、划掉）不想要的标签排除代价
+                // 此处“划掉”所选标签表示“使标签重新有效化” Make Tag Enabled Again
+                // 首先搜索完全不包含所选标签的代价
+                let current_disabled_tags = [];
+                let cost_without_disabled_tags = [];
+                console.log('当前标签池', current_tag_pool);
+                for (let i = 0; i < current_tag_pool.length; i++) {
+                    if (current_selected_tag_indices.has(i)) {
+                        current_disabled_tags.push(current_tag_pool[i]);
+                    }
+                }
+                console.log('当前禁用标签', current_disabled_tags);
+                for (let i = 0; i < current_cost_pool.length; i++) {
+                    // 标签集合与所选标签集合的交集为空的代价就会被选中
+                    if (intersection(new Set(current_cost_pool[i]['tag']), new Set(current_disabled_tags)).size == 0) {
+                        cost_without_disabled_tags.push(current_cost_pool[i]);
+                    }
+                }
+                console.log(`共有${cost_without_disabled_tags.length}条代价符合条件`);
+                let roll_success = Math.floor(Math.random() * 100)
+                console.log(`1到100的随机数等于${roll_success}，小于50时禁用成功`)
+                // 50%的概率禁用完全有效
+                if (cost_without_disabled_tags.length > 0 && roll_success < 50) {
+                    console.log(`禁用成功了`);
+                    console.log(`共有${cost_without_disabled_tags.length}条代价符合条件，从中随机选择一条`);
+                    console.log(cost_without_disabled_tags);
+                    cost_result = sample(cost_without_disabled_tags, 1)[0];
+                }
+                // 50%的概率禁用失败
+                else {
+                    // 代价池中没有任何一条代价完全不包含所选标签的情况
+                    // （80%的概率）首先仅划掉部分所选标签
+                    // 标签集合与所选标签集合的交集不为空且为所选标签集合的真子集的代价就会被选中
+                    console.log(`禁用失败了`);
+                    for (let i = 0; i < current_cost_pool.length; i++) {
+                        let set_1 = intersection(new Set(current_cost_pool[i]['tag']), new Set(current_disabled_tags));
+                        if (set_1.size > 0 && set_1.size < new Set(current_disabled_tags).size) {
+                            cost_without_disabled_tags.push(current_cost_pool[i]);
+                        }
+                    }
+                    console.log(`共有${cost_without_disabled_tags.length}条代价符合条件，从中随机选择一条`);
+                    console.log(cost_without_disabled_tags);
+                    cost_result = sample(cost_without_disabled_tags, 1)[0];
+                    if (Math.random() < 0.2 || !cost_result) {
+                        // 20%的概率划掉所有标签（全部有效化）
+                        // 仅划掉部分所选标签时也没有任何一条代价完全不包含剩余所选标签的情况也需要直接随机选择
+                        // 直接从代价中随机选择一条
+                        // 可能出现标签被划掉了但是随机选择后实际有效，之后也显示为有效的情况，不过没有关系
+                        console.log(`全 划 了，从全部代价中随机选择一条`);
+                        cost_result = sample(current_cost_pool, 1)[0];
+                    }
+                }
+                console.log('代价：', cost_result['text']);
+                console.log('标签：', cost_result['tag']);
 
-            // 实际有效的标签
-            tag_useful = intersection(new Set(cost_result['tag']), new Set(current_selected_tags));
-            console.log('tag_useful', tag_useful);
+                let result_tag_set = new Set(cost_result['tag']);
+                // 实际有效的标签（此处“有效”表示所选标签不在代价的标签集合中，起到了禁用效果）
+                let tag_useful_set = difference(new Set(current_disabled_tags), result_tag_set);
+                console.log('实际有效的标签', tag_useful_set);
 
-            // 没用上的标签，划掉
-            tag_useless = difference(new Set(current_selected_tags), new Set(cost_result['tag']));
-            console.log('tag_useless', tag_useless);
-            for (let i = 0; i < 5; i++) {
-                if (current_selected_tag_indices.has(i) && tag_useless.has(document.getElementById(`div_tag_${i}`).innerHTML)) {
-                    document.getElementById(`div_tag_${i}`).classList.add('div_tag_button_useless');
+                // 没用上的标签，划掉（此处“没用上”表示所选标签在代价的标签集合中，没起到禁用效果）
+                let tag_useless_set = intersection(new Set(current_disabled_tags), result_tag_set);
+                console.log('没用上的标签', tag_useless_set);
+
+                // 把标签涂上对应的颜色
+                for (let i = 0; i < 9; i++) {
+                    let tag_text = document.getElementById(`div_tag_${i}`).innerHTML
+                    if (result_tag_set.has(tag_text)) {
+                        if (tag_useless_set.has(tag_text)) {
+                            document.getElementById(`div_tag_${i}`).classList.remove('div_tag_button_disabled');
+                            document.getElementById(`div_tag_${i}`).classList.add('div_tag_button_disabled_useless');
+                        }
+                        else {
+                            document.getElementById(`div_tag_${i}`).classList.add('div_tag_button_enabled');
+                        }
+                    }
                 }
             }
 
@@ -450,6 +549,9 @@
                 document.getElementById('div_cost_OK').onclick = handle_overlay;
                 document.getElementById(`td_cost_${current_row}`).innerHTML = cost_text;
                 draw_row();
+                // 下一次抽取代价的模式
+                // cost_mode = Math.floor(Math.random() * 2);
+                cost_mode = 1;
             }, 2333);
         }
 
@@ -493,13 +595,20 @@
 
         function handle_tag(tag_id) {
             let div_tag = `div_tag_${tag_id}`;
+            let max_tag = cost_mode == 0 ? 3 : 5;
             if (current_selected_tag_indices.has(tag_id)) {
-                document.getElementById(div_tag).classList.remove('div_tag_button_selected');
+                document.getElementById(div_tag).classList.remove('div_tag_button_enabled');
+                document.getElementById(div_tag).classList.remove('div_tag_button_disabled');
                 current_selected_tag_indices.delete(tag_id);
             }
             else {
-                if (current_selected_tag_indices.size < 3) {
-                    document.getElementById(div_tag).classList.add('div_tag_button_selected');
+                if (current_selected_tag_indices.size < max_tag) {
+                    if (cost_mode == 0) {
+                        document.getElementById(div_tag).classList.add('div_tag_button_enabled');
+                    }
+                    if (cost_mode == 1) {
+                        document.getElementById(div_tag).classList.add('div_tag_button_disabled');
+                    }
                     current_selected_tag_indices.add(tag_id);
                 }
             }
@@ -516,36 +625,53 @@
         }
 
         function reset_cost_tag_pool() {
-            // 随机选出10条代价，标签总数小于5时，重新随机选择代价，直到标签总数大于等于5
+            // 初始化代价池和标签池
+            // 公开招募模式：随机选出10条代价，标签总数小于5时，重新随机选择代价，直到标签总数大于等于5
+            // 反向公开招募模式：随机选出16条代价，标签总数小于9时，重新随机选择代价，直到标签总数大于等于9
+            let retry_cnt = 0;
             let tag_set = new Set();
-            let cnt = 0;
-            while (tag_set.size < 5 && cnt < 10) {
-                cnt += 1;
-                current_cost_pool = sample(current_settings['cost'], 10);
+            let tag_cap = cost_mode == 0 ? 10 : 16;
+            let tag_cnt = cost_mode == 0 ? 5 : 9;
+            while (tag_set.size < tag_cnt && retry_cnt < 10) {
+                retry_cnt += 1;
+                current_cost_pool = sample(current_settings['cost'], tag_cap);
                 tag_set = get_tag_set(current_cost_pool);
-                console.log(current_cost_pool);
-                console.log(tag_set);
+                console.log('当前代价池', current_cost_pool);
+                console.log('当前代价池中所有代价的标签集合', tag_set);
             }
             // 首先随机选1条代价，随机选择2至3个标签，但最多不超过它的标签总数
             let cost_1 = current_cost_pool[Math.floor(Math.random() * current_cost_pool.length)];
             let tag_1_cnt = Math.min(cost_1['tag'].length, Math.floor(Math.random() * 2) + 2);
             let tag_1 = sample(cost_1['tag'], tag_1_cnt);
             console.log(cost_1['text'], cost_1['tag'], tag_1_cnt, tag_1);
-            // 从所有标签集合中移除已被选择的标签，再随机选择标签凑齐5个
+            // 从所有标签集合中移除已被选择的标签，再随机选择标签凑齐5个（标签总数）
             let tag_set_rest = Array.from(difference(tag_set, new Set(tag_1)));
-            current_tag_pool = shuffle(tag_1.concat(sample(tag_set_rest, 5 - tag_1_cnt)));
-            console.log(current_tag_pool);
-            for (let i = 0; i < 5; i++) {
+            current_tag_pool = shuffle(tag_1.concat(sample(tag_set_rest, tag_cnt - tag_1_cnt)));
+            console.log('当前标签池', current_tag_pool);
+            for (let i = 0; i < tag_cnt; i++) {
                 document.getElementById(`div_tag_${i}`).innerHTML = current_tag_pool[i];
             }
+        }
 
-            // 初始化
-            // reset_overlay()
+        function reset_overlay() {
+            // 初始化代价抽取层
             flag_handle_cost_done = false;
             current_selected_tag_indices.clear();
-            for (let i = 0; i < 5; i++) {
-                document.getElementById(`div_tag_${i}`).classList.remove('div_tag_button_selected');
-                document.getElementById(`div_tag_${i}`).classList.remove('div_tag_button_useless');
+            for (let i = 0; i < 9; i++) {
+                document.getElementById(`div_tag_${i}`).classList.remove('div_tag_button_enabled');
+                document.getElementById(`div_tag_${i}`).classList.remove('div_tag_button_enabled_useless');
+                document.getElementById(`div_tag_${i}`).classList.remove('div_tag_button_disabled');
+                document.getElementById(`div_tag_${i}`).classList.remove('div_tag_button_disabled_useless');
+            }
+            if (cost_mode == 0) {
+                document.getElementById(`td_tag_comment`).innerHTML = '代价需求（最多3项）';
+                document.getElementById(`div_tag_5`).style.display = "none";
+                document.getElementById(`tr_tag_row_3`).style.display = "none";
+            }
+            if (cost_mode == 1) {
+                document.getElementById(`td_tag_comment`).innerHTML = `禁用不想要的代价标签（最多5项）`;
+                document.getElementById(`div_tag_5`).style.display = "";
+                document.getElementById(`tr_tag_row_3`).style.display = "";
             }
             document.getElementById('td_cost_result').innerHTML = '这里显示抽出的代价';
             document.getElementById('div_cost_OK').innerHTML = '确认';
@@ -788,6 +914,7 @@
                 document.getElementById('div_cost_OK').onclick = handle_cost;
                 if (flag_handle_cost_done) {
                     reset_cost_tag_pool();
+                    reset_overlay();
                 }
             }
             else {
@@ -890,7 +1017,9 @@
 
         load_settings();
         draw_row();
+        cost_mode = 1;
         reset_cost_tag_pool();
+        reset_overlay();
         document.onclick = () => {
             handle_wish_options_toggle();
         }
