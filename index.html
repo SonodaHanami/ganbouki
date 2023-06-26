@@ -355,24 +355,31 @@
                 console.log('标签：', cost_result['tag']);
             }
             else {
-                // 应该去除部分标签重新搜索，之后优化
-                // 只要包含其中一个标签就会被选中
-                for (let i = 0; i < current_cost_pool.length; i++) {
-                    let flag = false;
-                    for (let j = 0; j < current_selected_tags.length; j++) {
-                        if (current_cost_pool[i]['tag'].includes(current_selected_tags[j])) {
-                            flag = true;
+                // 代价池中没有任何一条代价完全满足所选标签的情况
+                if (Math.random() < 0.8) {
+                    // 80%的概率仅划掉部分所选标签
+                    // 标签与所选标签的交集不为空就会被选中
+                    for (let i = 0; i < current_cost_pool.length; i++) {
+                        if (intersection(new Set(current_cost_pool[i]['tag']), new Set(current_selected_tags)).size > 0) {
+                            cost_with_selected_tags.push(current_cost_pool[i]);
                         }
                     }
-                    if (flag) {
-                        cost_with_selected_tags.push(current_cost_pool[i]);
-                    }
+                    // 从中随机选择一条
+                    cost_result = sample(cost_with_selected_tags, 1)[0];
+                    console.log(cost_result);
+                    console.log('代价：', cost_result['text']);
+                    console.log('标签：', cost_result['tag']);
                 }
-                cost_result = sample(cost_with_selected_tags, 1)[0];
-                console.log(cost_result);
-                console.log('代价：', cost_result['text']);
-                console.log('标签：', cost_result['tag']);
-                // 应该还有全部划掉的情况，之后优化
+                else {
+                    // 20%的概率划掉所有标签
+                    // 直接从代价中随机选择一条
+                    // 可能出现标签被划掉了但是随机选择后实际有效，之后也显示为有效的情况，不过没有关系
+                    console.log('全 划 了');
+                    cost_result = sample(current_cost_pool, 1)[0];
+                    console.log(cost_result);
+                    console.log('代价：', cost_result['text']);
+                    console.log('标签：', cost_result['tag']);
+                }
             }
 
             // 实际有效的标签
