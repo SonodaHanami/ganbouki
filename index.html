@@ -315,7 +315,7 @@
         </tr>
         <tr>
             <td colspan="2" id="td_notice_2">
-                这是<span style="color:#ebeb16">反向公开招募</span>测试版本，可以从设置返回标准版本喵
+                这是<span style="color:#ebeb16">反向公开招募</span>测试版本，现在每次抽取代价的模式都会随机；可以从设置返回标准版本喵
             </td>
         </tr>
         <tr>
@@ -339,7 +339,7 @@
         let default_settings_md5 = '';
         let last_checked = ''; // the last checked default_settings_md5
         let default_settings, update_message;
-        let cost_mode = 1;
+        let cost_mode = Math.floor(Math.random() * 2);
         let current_cost_pool = [];
         let current_tag_pool = [];
         let current_selected_tag_indices = new Set();
@@ -435,7 +435,7 @@
                 }
                 console.log(`共有${cost_without_disabled_tags.length}条代价符合条件`);
                 let roll_success = Math.floor(Math.random() * 100)
-                console.log(`1到100的随机数等于${roll_success}，小于50时禁用成功`)
+                console.log(`0到99的随机数等于${roll_success}，小于50时禁用成功`)
                 // 50%的概率禁用完全有效
                 if (cost_without_disabled_tags.length > 0 && roll_success < 50) {
                     console.log(`禁用成功了`);
@@ -549,9 +549,8 @@
                 document.getElementById('div_cost_OK').onclick = handle_overlay;
                 document.getElementById(`td_cost_${current_row}`).innerHTML = cost_text;
                 draw_row();
-                // 下一次抽取代价的模式
-                // cost_mode = Math.floor(Math.random() * 2);
-                cost_mode = 1;
+                // 随机决定下一次抽取代价的模式
+                cost_mode = Math.floor(Math.random() * 2);
             }, 2333);
         }
 
