@@ -212,7 +212,7 @@
             <table class="table_text" id="table_cost">
                 <tr>
                     <td colspan="2">
-                        <div class="div_button" onclick="handle_overlay();">关闭</div>
+                        <div class="div_button" id="div_cost_exit" onclick="handle_overlay();">关闭</div>
                     </td>
                 </tr>
                 <tr></tr>
@@ -347,10 +347,11 @@
         let flag_handle_cost_done = false;
 
         function handle_cost() {
-            // 禁用按钮
-            // TODO：把关闭按钮也禁用
+            // 禁用关闭按钮和确认按钮
             document.getElementById('div_cost_OK').innerHTML = '请稍候';
             document.getElementById('div_cost_OK').onclick = undefined;
+            document.getElementById('div_cost_exit').innerHTML = '请稍候';
+            document.getElementById('div_cost_exit').onclick = undefined;
 
             let cost_result;
             if (cost_mode == 0) {
@@ -702,6 +703,8 @@
                 flag_handle_cost_done = true;
                 document.getElementById('div_cost_OK').innerHTML = '关闭';
                 document.getElementById('div_cost_OK').onclick = handle_overlay;
+                document.getElementById('div_cost_exit').innerHTML = '关闭';
+                document.getElementById('div_cost_exit').onclick = handle_overlay;
                 document.getElementById(`td_cost_${current_row}`).innerHTML = cost_text;
                 draw_row();
                 // 随机决定下一次抽取代价的模式
