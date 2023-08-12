@@ -603,7 +603,8 @@
                     }
                 }
                 if ('text' in kuromaku) {
-                    cost_result = kuromaku
+                    cost_result = kuromaku;
+                    kuromaku = {};
                 }
                 console.log('代价：', cost_result['text']);
                 console.log('标签：', cost_result['tag']);
