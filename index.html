@@ -315,8 +315,7 @@
         </tr>
         <tr>
             <td colspan="2" id="td_notice_2">
-                <p><span style="color:#ebaefc">优化了页面加载（大概）</span></p>
-                <p><span style="color:#ebeb16">优化了部分代价描述，“离开本层前”现在是“离开下一次进入的作战节点所在的那一层前”</span></p>
+                <p><span style="color:#ebeb16">优化了抽取代价界面的提示</span></p>
             </td>
         </tr>
         <tr>
@@ -898,7 +897,7 @@
                 document.getElementById(`tr_tag_row_3`).style.display = "";
             }
             if (cost_mode == 2) {
-                document.getElementById(`td_tag_comment`).innerHTML = `<span style="color:#00AAFF">选中想要的代价标签</span>（最多3项），<span style="color:#ebeb16">禁用不想要的代价标签</span>（最多5项）`;
+                document.getElementById(`td_tag_comment`).innerHTML = `<p><span style="color:#00aaff">选中想要的代价标签</span>（最多3项），但是<span style="color:#bb5a5a">抽取时可能失效</span></p><p><span style="color:#ebeb16">禁用不想要的代价标签</span>（最多5项），但是<span style="color:#76cb8b">抽取时可能失效</span></p>`;
                 document.getElementById(`div_tag_5`).style.display = "";
                 document.getElementById(`tr_tag_row_3`).style.display = "";
             }
