@@ -36,7 +36,8 @@
             margin-right: 20px;
         }
 
-        a:link, a:visited {
+        a, a:link, a:visited {
+            text-decoration: none;
             color: #FFA500;
         }
 
@@ -108,14 +109,15 @@
             margin-top: 15px;
         }
 
-        .div_button {
+        .div_button, .div_tag_button, .div_settings_button {
             background-color: #F0F0F07F;
-            padding: 10px;
-            border-radius: 3px;
-            border-color: #000;
-            border-style: solid;
-            border-width: 1px;
             text-align: center;
+            padding: 10px;
+            border-width: 1px;
+            border-style: solid;
+            border-color: #000;
+            border-radius: 3px;
+            cursor: pointer;
         }
 
         .wish_option {
@@ -123,10 +125,11 @@
             height: 32px;
             padding: 3px 10px;
             margin-top: 2px;
-            border-radius: 3px;
-            border-style: solid;
             border-width: 1px;
+            border-style: solid;
             border-color: #000;
+            border-radius: 3px;
+            cursor: pointer;
         }
 
         .div_button:hover, .wish_option:hover {
@@ -151,26 +154,13 @@
         .div_notice_button {
             width: 50px;
             display: inline-block;
-            background-color: #F0F0F07F;
-            padding: 10px;
-            border-radius: 3px;
-            border-color: #000;
-            border-style: solid;
-            border-width: 1px;
-            text-align: center;
         }
 
         .div_tag_button, .div_settings_button {
             width: 150px;
             display: inline-block;
-            background-color: #F0F0F07F;
-            padding: 10px;
-            border-radius: 3px;
-            border-color: #000;
-            border-style: solid;
-            border-width: 1px;
-            text-align: center;
         }
+
 
         .div_tag_button:hover {
             outline-color: #00AAFF;
@@ -313,9 +303,23 @@
                 当前设置md5：<span id="span_md5_0">undefined</span>
             </td>
         </tr>
-        <tr>
-            <td colspan="2" id="td_notice_2">
-                <p><span style="color:#ebeb16">优化了抽取代价界面的提示</span></p>
+        <tr id="tr_superchat">
+            <td>
+                <div id="div_superchat" style="border-width: 1px; border-style: solid; border-color: rgb(171, 26, 50); border-radius: 12px; overflow: hidden;">
+                    <div id="div_sc_top_part" style="background-image: url(&quot;&quot;); background-color: rgb(255, 216, 216); height: 80px; padding: 8px 0px; box-sizing: border-box; background-position: right top; background-repeat: no-repeat; background-size: contain; position: relative;">
+                        <div id="div_sc_user_info" style="padding-top: 0px; padding-left: 100px; position: relative;">
+                            <div style="top: 0; left: 18px; width: 64px; height: 64px; position: absolute;">
+                                <div id="div_sc_user_face" style="width:100%; height: 100%; background-image: url(&quot;https://wsrv.nl/?url=https://i1.hdslb.com/bfs/face/58db90b7f41cd7ab97572e6af0140ad32dcdc489.jpg&quot;); background-size: cover; border-radius: 50%;"></div>
+                            </div>
+                            <div id="div_sc_user_name" style="color: #dddddddd; white-space: nowrap; text-overflow: ellipsis;">羽波</div>
+                            <div id="div_sc_price" style="padding-top: 2px;">50000 龙门币</div>
+                        </div>
+                        <div onclick="hide_superchat();" style="position: absolute; top: 0; right: 8px; color:#ffffff77; cursor: pointer;">×</div>
+                    </div>
+                    <div id="div_sc_bottom_part" style="background-color: rgb(171, 26, 50);">
+                        <div style="padding: 10px 20px;">更新了很醒目的提示样式 <span style="text-decoration: line-through; text-decoration-thickness: 1px;">这下SC免费了</span></div>
+                    </div>
+                </div>
             </td>
         </tr>
         <tr>
@@ -1175,6 +1179,14 @@
             else {
                 document.getElementById(target).classList.add('td_cost_not_paid');
             }
+        }
+
+        function show_superchat() {
+            document.getElementById('div_superchat').style.display = '';
+        }
+
+        function hide_superchat() {
+            document.getElementById('div_superchat').style.display = 'none';
         }
 
         // 超集，set是否为subset的超集，即subset是否为set的子集
