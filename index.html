@@ -2,7 +2,6 @@
 <head>
     <title>随机肉鸽许愿机</title>
     <link rel="icon" href="./favicon.ico">
-    <script src="https://raw.githubusercontent.com/blueimp/JavaScript-MD5/master/js/md5.min.js"></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QGM58QCD7C"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -183,16 +182,6 @@
         .div_tag_button_disabled_useless {
             background-color: #76cb8b;
         }
-
-        #td_md5 {
-            text-align: center;
-            opacity: 0;
-        }
-
-        #td_md5:hover {
-            opacity: 1;
-            background-color: #2B666666;
-        }
     </style>
 </head>
 
@@ -259,11 +248,6 @@
         <tr id="tr_warning" style="display:none"></tr>
         <tr style="display:none">
             <td colspan="2">
-                当前设置md5：<span id="span_md5_1">undefined</span>
-            </td>
-        </tr>
-        <tr style="display:none">
-            <td colspan="2">
                 <div class="div_settings_button" onclick="handle_notice(101);">使用默认设置</div>
                 <div class="div_settings_button" onclick="handle_notice(102);">恢复之前设置</div>
             </td>
@@ -298,11 +282,6 @@
         </tr>
     </table>
     <table class="table_text" id="table_main">
-        <tr style="display:none">
-            <td colspan="2" id="td_md5" onclick="handle_td_md5();">
-                当前设置md5：<span id="span_md5_0">undefined</span>
-            </td>
-        </tr>
         <tr id="tr_superchat">
             <td>
                 <div id="div_superchat" style="border-width: 1px; border-style: solid; border-color: rgb(226, 181, 43); border-radius: 12px; overflow: hidden;">
@@ -340,9 +319,6 @@
         };
         let current_wish_index = -1;
         let last_toggle = 0;
-        let current_settings_md5 = '';
-        let default_settings_md5 = '';
-        let last_checked = ''; // the last checked default_settings_md5
         let default_settings, update_message, kuromaku;
         let cost_mode = 0;
         let current_cost_pool = [];
@@ -988,22 +964,6 @@
             last_toggle = now;
         }
 
-        function handle_md5() {
-            current_settings_md5 = md5(JSON.stringify(current_settings));
-            default_settings_md5 = md5(JSON.stringify(default_settings));
-            document.getElementById('span_md5_0').innerHTML = current_settings_md5;
-            document.getElementById('span_md5_1').innerHTML = current_settings_md5;
-        }
-
-        function handle_td_md5() {
-            if (document.getElementById('td_md5').style.opacity == 0) {
-                document.getElementById('td_md5').style.opacity = 1;
-            }
-            else {
-                document.getElementById('td_md5').style.removeProperty('opacity');
-            }
-        }
-
         function handle_notice(code, message) {
             if (!code) {
                 // 隐藏提示
@@ -1013,15 +973,14 @@
             else if (code == 1 || code == 100) {
                 // 设置更新
                 set_settings_textarea();
-                handle_md5();
                 // save_settings();
-                let notice_text = `设置已更新（${current_settings_md5.slice(0, 7)}）`;
+                let notice_text = `设置已更新`;
                 if (message) {
-                    notice_text = `设置已更新（${current_settings_md5.slice(0, 7)} ${message}）`;
+                    notice_text += message;
                 }
                 if (code == 1) {
                     // 初始化默认设置
-                    notice_text = `已初始化默认设置（md5：${current_settings_md5}）`;
+                    notice_text = `已初始化默认设置`;
                 }
                 document.getElementById('td_notice').innerHTML = notice_text;
                 document.getElementById('td_notice_button').innerHTML = `
@@ -1076,7 +1035,7 @@
                 if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) {
                     // 从服务器获得数据
                     default_settings = JSON.parse(xhr.responseText);
-                    console.log('load default_settings', md5(JSON.stringify(default_settings)));
+                    console.log('load default_settings');
                 }
             };
             xhr.send(null);
@@ -1090,7 +1049,7 @@
                 if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) {
                     // 从服务器获得数据
                     kuromaku = JSON.parse(xhr.responseText);
-                    console.log('load default_settings', md5(JSON.stringify(default_settings)));
+                    console.log('load default_settings');
                 }
             };
             xhr.send(null);
@@ -1106,7 +1065,6 @@
                 let backup_settings = JSON.parse(storage['data_ganbouki_backup']);
                 current_settings['wish'] = backup_settings['wish'];
                 current_settings['cost'] = backup_settings['cost'];
-                handle_md5();
             }
         }
 
@@ -1114,7 +1072,6 @@
             // 使用默认设置
             current_settings['wish'] = default_settings['wish'];
             current_settings['cost'] = default_settings['cost'];
-            handle_md5();
         }
 
         function set_settings_textarea() {
@@ -1167,7 +1124,6 @@
                     'last_checked': last_checked,
                 };
                 storage['data_ganbouki'] = JSON.stringify(data_to_save);
-                handle_md5();
                 return true;
             }
         }
@@ -1369,7 +1325,6 @@
         document.onclick = () => {
             handle_wish_options_toggle();
         }
-        handle_td_md5();
         if (Math.random() < 0.9 && default_settings['superchat'] && default_settings['superchat'].length) {
             show_superchat(get_random_one(default_settings['superchat']));
         }
