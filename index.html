@@ -305,19 +305,17 @@
         </tr>
         <tr id="tr_superchat">
             <td>
-                <div id="div_superchat" style="border-width: 1px; border-style: solid; border-color: rgb(171, 26, 50); border-radius: 12px; overflow: hidden;">
-                    <div id="div_sc_top_part" style="background-image: url(&quot;&quot;); background-color: rgb(255, 216, 216); height: 80px; padding: 8px 0px; box-sizing: border-box; background-position: right top; background-repeat: no-repeat; background-size: contain; position: relative;">
-                        <div id="div_sc_user_info" style="padding-top: 0px; padding-left: 100px; position: relative;">
-                            <div style="top: 0; left: 18px; width: 64px; height: 64px; position: absolute;">
-                                <div id="div_sc_user_face" style="width:100%; height: 100%; background-image: url(&quot;https://wsrv.nl/?url=https://i1.hdslb.com/bfs/face/58db90b7f41cd7ab97572e6af0140ad32dcdc489.jpg&quot;); background-size: cover; border-radius: 50%;"></div>
-                            </div>
-                            <div id="div_sc_user_name" style="color: #dddddddd; white-space: nowrap; text-overflow: ellipsis;">羽波</div>
-                            <div id="div_sc_price" style="padding-top: 2px;">50000 龙门币</div>
+                <div id="div_superchat" style="border-width: 1px; border-style: solid; border-color: rgb(226, 181, 43); border-radius: 12px; overflow: hidden;">
+                    <div id="div_sc_top_part" style="background-image: url(&quot;&quot;); background-color: rgb(255, 241, 197); height: 80px; padding: 8px 0px; box-sizing: border-box; background-position: right top; background-repeat: no-repeat; background-size: contain; position: relative;">
+                        <div style="padding-top: 0px; padding-left: 100px; position: relative;">
+                            <div id="div_sc_user_face" style="top: 0; left: 18px; width: 64px; height: 64px; position: absolute; background-image: url(&quot;https://wsrv.nl/?url=https://i1.hdslb.com/bfs/face/505f3d799d3db43b22d2f17450428e595ceccdf6.jpg&quot;); background-size: cover; border-radius: 50%;"></div>
+                            <div id="div_sc_user_name" style="color: #dddddddd; white-space: nowrap; text-overflow: ellipsis;">玛恩纳</div>
+                            <div id="div_sc_price" style="padding-top: 2px;">1000 龙门币</div>
                         </div>
-                        <div onclick="hide_superchat();" style="position: absolute; top: 0; right: 8px; color:#ffffff77; cursor: pointer;">×</div>
+                        <div onclick="hide_superchat();" style="position: absolute; top: 0; right: 8px; color:#ffffff; cursor: pointer;">×</div>
                     </div>
-                    <div id="div_sc_bottom_part" style="background-color: rgb(171, 26, 50);">
-                        <div style="padding: 10px 20px;">更新了很醒目的提示样式 <span style="text-decoration: line-through; text-decoration-thickness: 1px;">这下SC免费了</span></div>
+                    <div id="div_sc_bottom_part" style="background-color: rgb(226, 181, 43);">
+                        <div id="div_sc_text" style="padding: 10px 20px;">……下雨了。</div>
                     </div>
                 </div>
             </td>
@@ -353,6 +351,46 @@
         let current_disabled_tag_indices = new Set();
         let flag_handle_cost_done = false;
 
+        const wsrv = 'https://wsrv.nl/?url='
+        const superchat_colors = {
+            'blue': {
+                'dark': 'rgb(42, 96, 178)',
+                'light': 'rgb(237, 245, 255)',
+            },
+            'cyan': {
+                'dark': 'rgb(66, 125, 158)',
+                'light': 'rgb(219, 255, 253)',
+            },
+            'yellow': {
+                'dark': 'rgb(226, 181, 43)',
+                'light': 'rgb(255, 241, 197)',
+            },
+            'orange': {
+                'dark': 'rgb(224, 148, 67)',
+                'light': 'rgb(255, 234, 210)',
+            },
+            'red': {
+                'dark': 'rgb(229, 77, 77)',
+                'light': 'rgb(255, 231, 228)',
+            },
+            'darkred': {
+                'dark': 'rgb(171, 26, 50)',
+                'light': 'rgb(255, 216, 216)',
+            },
+            'darkgreen': {
+                'dark': 'rgb(0, 125, 108)',
+                'light': 'rgb(160, 200, 192)',
+            }
+        }
+        const superchat_prices = [0, 2.5, Math.PI, 5, 20, 50, 300, 302, 500, 666, 734, 1000, 1155, 1230, 2000, 5000, 6666, 10000, 20000, 50000, 66666, 100000, 666666, 180000, 1800000, 3044248, 37000000]
+        let default_superchat = {
+            'face': 'https://i0.hdslb.com/bfs/face/a84fa10f90f7060d0336384954ee1cde7a8e9bc6.jpg',
+            'name': '魔法Zc目录',
+            'price': '随机',
+            'unit': '龙门币',
+            'text': '没错，正是这本Zc攻略宝典',
+        }
+
         function handle_cost() {
             // 禁用关闭按钮和确认按钮
             document.getElementById('div_cost_OK').innerHTML = '请稍候';
@@ -382,7 +420,7 @@
                 if (cost_with_enabled_tags.length > 0) {
                     console.log(`共有${cost_with_enabled_tags.length}条代价完全符合条件，从中随机选择一条`);
                     console.log(cost_with_enabled_tags);
-                    cost_result = sample(cost_with_enabled_tags, 1)[0];
+                    cost_result = get_random_one(cost_with_enabled_tags);
                 }
                 else {
                     // 代价池中没有任何一条代价完全满足所选标签的情况
@@ -396,13 +434,13 @@
                     }
                     console.log(`共有${cost_with_enabled_tags.length}条代价符合条件（划掉部分），从中随机选择一条`);
                     console.log(cost_with_enabled_tags);
-                    cost_result = sample(cost_with_enabled_tags, 1)[0];
+                    cost_result = get_random_one(cost_with_enabled_tags);
                     if (Math.random() < 0.2) {
                         // 20%的概率划掉所有标签
                         // 直接从代价中随机选择一条
                         // 可能出现标签被划掉了但是随机选择后实际有效，之后也显示为有效的情况，不过没有关系
                         console.log(`全 划 了，从全部代价中随机选择一条`);
-                        cost_result = sample(current_cost_pool, 1)[0];
+                        cost_result = get_random_one(current_cost_pool);
                     }
                 }
                 console.log('代价：', cost_result['text']);
@@ -457,7 +495,7 @@
                     console.log(`禁用成功了`);
                     console.log(`从符合条件的代价中随机选择一条`);
                     console.log(cost_without_disabled_tags);
-                    cost_result = sample(cost_without_disabled_tags, 1)[0];
+                    cost_result = get_random_one(cost_without_disabled_tags, 1);
                 }
                 // 50%的概率禁用失败
                 else {
@@ -473,14 +511,14 @@
                     }
                     console.log(`共有${cost_without_disabled_tags.length}条代价符合条件（禁用失败），从中随机选择一条`);
                     console.log(cost_without_disabled_tags);
-                    cost_result = sample(cost_without_disabled_tags, 1)[0];
+                    cost_result = get_random_one(cost_without_disabled_tags, 1);
                     if (Math.random() < 0.2 || !cost_result) {
                         // 20%的概率划掉所有标签（全部有效化）
                         // 仅划掉部分所选标签时也没有任何一条代价完全不包含剩余所选标签的情况也需要直接随机选择
                         // 直接从代价中随机选择一条
                         // 可能出现标签被划掉了但是随机选择后实际有效，之后也显示为有效的情况，不过没有关系
                         console.log(`全 划 了，从全部代价中随机选择一条`);
-                        cost_result = sample(current_cost_pool, 1)[0];
+                        cost_result = get_random_one(current_cost_pool);
                     }
                 }
                 console.log('代价：', cost_result['text']);
@@ -562,7 +600,7 @@
                     }
                     console.log(`共有${cost_without_disabled_tags.length}条代价符合条件（禁用失败），之后从中正向筛选`);
                     console.log(cost_without_disabled_tags);
-                    cost_result = sample(cost_without_disabled_tags, 1)[0];
+                    cost_result = get_random_one(cost_without_disabled_tags);
                     if (Math.random() < 0.2 || !cost_result) {
                         // 20%的概率划掉所有标签（全部有效化）
                         // 仅划掉部分所选标签时也没有任何一条代价完全不包含剩余所选标签的情况也需要直接随机选择
@@ -585,7 +623,7 @@
                 if (cost_with_enabled_tags.length > 0) {
                     console.log(`共有${cost_with_enabled_tags.length}条代价完全符合条件，从中随机选择一条`);
                     console.log(cost_with_enabled_tags);
-                    cost_result = sample(cost_with_enabled_tags, 1)[0];
+                    cost_result = get_random_one(cost_with_enabled_tags);
                 }
                 else {
                     // 代价池中没有任何一条代价完全满足所选标签的情况
@@ -599,14 +637,14 @@
                     }
                     console.log(`共有${cost_with_enabled_tags.length}条代价符合条件（划掉部分），从中随机选择一条`);
                     console.log(cost_with_enabled_tags);
-                    cost_result = sample(cost_with_enabled_tags, 1)[0];
+                    cost_result = get_random_one(cost_with_enabled_tags);
                     if (Math.random() < 0.2) {
                         // 20%的概率划掉所有标签
                         // 直接从代价中随机选择一条
                         // 可能出现标签被划掉了但是随机选择后实际有效，之后也显示为有效的情况，不过没有关系
                         console.log(`全 划 了，从全部代价中随机选择一条`);
                         // TODO：随机选择的范围？
-                        cost_result = sample(cost_without_disabled_tags, 1)[0];
+                        cost_result = get_random_one(cost_without_disabled_tags);
                     }
                 }
                 if ('text' in kuromaku) {
@@ -723,6 +761,11 @@
                 // 锁定测试新模式
                 cost_mode = 2;
             }, 2333);
+            setTimeout(() => {
+                if ('superchat' in cost_result) {
+                    show_superchat(get_random_one(cost_result['superchat']));
+                }
+            }, 5000);
         }
 
         function draw_row(new_row=true) {
@@ -1181,7 +1224,46 @@
             }
         }
 
-        function show_superchat() {
+        function get_superchat_color(price, unit) {
+            let color = 'blue';
+            if (unit == '源石锭') {
+                color = 'darkgreen';
+            }
+            else if (price < 500) {
+                color = 'blue';
+            }
+            else if (price < 1000) {
+                color = 'cyan';
+            }
+            else if (price < 5000) {
+                color = 'yellow';
+            }
+            else if (price < 10000) {
+                color = 'orange';
+            }
+            else if (price < 20000) {
+                color = 'red';
+            }
+            else {
+                color = 'darkred';
+            }
+            return superchat_colors[color];
+        }
+
+        function show_superchat(sc_data) {
+            let price = sc_data['price']
+            if (price == '随机') {
+                price = get_random_one(superchat_prices);
+            }
+            let color = get_superchat_color(price, sc_data['unit']);
+            document.getElementById('div_superchat').style.borderColor = color['dark'];
+            document.getElementById('div_sc_top_part').style.backgroundColor = color['light'];
+            document.getElementById('div_sc_user_face').style.backgroundImage = `url("${wsrv}${sc_data['face']}")`;
+            document.getElementById('div_sc_user_name').innerHTML = sc_data['name'];
+            document.getElementById('div_sc_price').innerHTML = `${price} ${sc_data['unit']}`;
+            document.getElementById('div_sc_bottom_part').style.backgroundColor = color['dark'];
+            document.getElementById('div_sc_text').innerHTML = sc_data['text'];
+
             document.getElementById('div_superchat').style.display = '';
         }
 
@@ -1241,8 +1323,16 @@
             return _difference;
         }
 
+        // 从list中随机取出1个元素
+        function get_random_one(list) {
+            return sample(list)[0];
+        }
+
         // 从list中随机取出size个元素
         function sample(list, size) {
+            if (!size) {
+                size = 1;
+            }
             if (size >= list.length) {
                 return list;
             }
@@ -1280,6 +1370,14 @@
             handle_wish_options_toggle();
         }
         handle_td_md5();
+        if (Math.random() < 0.9 && default_settings['superchat'] && default_settings['superchat'].length) {
+            show_superchat(get_random_one(default_settings['superchat']));
+        }
+        else {
+            if (Math.random() < 0.5) {
+                show_superchat(default_superchat);
+            }
+        }
     </script>
 </body>
 </html>
