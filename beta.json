@@ -14,32 +14,32 @@
     "cost": [
         {
             "tag": [
-                "延迟支付",
+                "延迟生效",
                 "作战后"
             ],
             "text": "在下一次作战结束时抽取另外{1}个代价"
         },
         {
             "tag": [
-                "延迟支付"
+                "延迟生效"
             ],
             "text": "在离开本层时抽取另外{1}个代价"
         },
         {
             "tag": [
-                "延迟支付"
+                "延迟生效"
             ],
             "text": "在探索进度达到第二层时抽取另外{1}个代价"
         },
         {
             "tag": [
-                "延迟支付"
+                "延迟生效"
             ],
             "text": "在探索进度达到第三层时抽取另外{1}个代价"
         },
         {
             "tag": [
-                "延迟支付"
+                "延迟生效"
             ],
             "text": "在探索进度达到第四层时抽取另外{1}个代价"
         },
@@ -520,6 +520,7 @@
         },
         {
             "tag": [
+                "延迟生效",
                 "作战前",
                 "编队",
                 "干员",
@@ -529,6 +530,7 @@
         },
         {
             "tag": [
+                "延迟生效",
                 "作战前",
                 "编队",
                 "干员",
@@ -594,6 +596,60 @@
         },
         {
             "tag": [
+                "作战前",
+                "编队",
+                "干员",
+                "数值",
+                "攻击范围"
+            ],
+            "text": "下一次作战，携带开启时改变攻击范围的技能的干员不能手动开启技能",
+            "superchat": [
+                {
+                    "face": "https://i2.hdslb.com/bfs/face/74b02b34908bf39a104ca51c89f1948d2d6a93ba.jpg",
+                    "name": "玛恩纳",
+                    "price": 1000,
+                    "unit": "龙门币",
+                    "text": "是时候看报纸"
+                },
+                {
+                    "face": "https://i1.hdslb.com/bfs/face/53ada0d5534788419ee6a68d0fbe464f2ea61842.jpg",
+                    "name": "霍尔海雅",
+                    "price": 500,
+                    "unit": "龙门币",
+                    "text": "对单龙卷风不能用了？怎么回事呢？"
+                }
+            ]
+        },
+        {
+            "tag": [
+                "延迟生效",
+                "作战前",
+                "编队",
+                "干员",
+                "数值",
+                "攻击范围"
+            ],
+            "text": "离开本层后，携带开启时改变攻击范围的技能的干员不能手动开启技能",
+            "superchat": [
+                {
+                    "face": "https://i2.hdslb.com/bfs/face/74b02b34908bf39a104ca51c89f1948d2d6a93ba.jpg",
+                    "name": "玛恩纳",
+                    "price": 1000,
+                    "unit": "龙门币",
+                    "text": "是时候看报纸"
+                },
+                {
+                    "face": "https://i1.hdslb.com/bfs/face/53ada0d5534788419ee6a68d0fbe464f2ea61842.jpg",
+                    "name": "霍尔海雅",
+                    "price": 500,
+                    "unit": "龙门币",
+                    "text": "对单龙卷风不能用了？怎么回事呢？"
+                }
+            ]
+        },
+        {
+            "tag": [
+                "延迟生效",
                 "作战前",
                 "编队",
                 "干员",
@@ -1419,6 +1475,76 @@
             "price": 50000,
             "unit": "龙门币",
             "text": "　"
+        },
+        {
+            "face": "https://i1.hdslb.com/bfs/face/d8b0f87c0989affe2b15b7a561d68a0d7a0c150d.jpg",
+            "name": "暗索",
+            "price": -20000,
+            "unit": "龙门币",
+            "text": "借点"
+        },
+        {
+            "face": "https://i2.hdslb.com/bfs/face/24d2c186cc63270434cfb6def0be165549b6b7d2.jpg",
+            "name": "刻俄柏",
+            "price": 3,
+            "unit": "蜜饼",
+            "text": "给你吃点"
+        },
+        {
+            "face": "https://i1.hdslb.com/bfs/face/e662198b412b3160146124cc07e14011a9cd68cf.jpg",
+            "name": "琳琅诗怀雅",
+            "price": -5,
+            "unit": "COST",
+            "text": "嗷呜"
+        },
+        {
+            "face": "https://i1.hdslb.com/bfs/face/e662198b412b3160146124cc07e14011a9cd68cf.jpg",
+            "name": "琳琅诗怀雅",
+            "price": -10,
+            "unit": "COST",
+            "text": "嗷呜"
+        },
+        {
+            "face": "https://i1.hdslb.com/bfs/face/e662198b412b3160146124cc07e14011a9cd68cf.jpg",
+            "name": "琳琅诗怀雅",
+            "price": -20,
+            "unit": "COST",
+            "text": "嗷呜"
+        },
+        {
+            "face": "https://i1.hdslb.com/bfs/face/e662198b412b3160146124cc07e14011a9cd68cf.jpg",
+            "name": "琳琅诗怀雅",
+            "price": -40,
+            "unit": "COST",
+            "text": "嗷呜"
+        },
+        {
+            "face": "https://i1.hdslb.com/bfs/face/e662198b412b3160146124cc07e14011a9cd68cf.jpg",
+            "name": "琳琅诗怀雅",
+            "price": -80,
+            "unit": "COST",
+            "text": "嗷呜"
+        },
+        {
+            "face": "https://i2.hdslb.com/bfs/face/fdaa5873052eb3c28b8b076c3344716cc71fdd87.jpg",
+            "name": "砾",
+            "price": "",
+            "unit": "",
+            "text": "啾"
+        },
+        {
+            "face": "https://i1.hdslb.com/bfs/archive/e2ee5cd1e2300dab1a7964110be279ad40958be8.jpg@320w_320h_1c",
+            "name": "阿",
+            "price": 300,
+            "unit": "龙门币",
+            "text": "明日方舟"
+        },
+        {
+            "face": "https://i1.hdslb.com/bfs/face/ad64c86cfb8134f96863a55564b7e924c18c788a.jpg",
+            "name": "杜林",
+            "price": 300,
+            "unit": "龙门币",
+            "text": "zzzzzzzzzzz"
         }
     ]
 }
