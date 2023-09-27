@@ -742,6 +742,7 @@
             setTimeout(() => {
                 if ('superchat' in cost_result) {
                     show_superchat(get_random_one(cost_result['superchat']));
+                    speak_superchat();
                 }
             }, 5000);
         }
@@ -1228,8 +1229,12 @@
             document.getElementById('div_sc_text').innerHTML = sc_data['text'];
 
             document.getElementById('div_superchat').style.display = '';
+        }
 
-            get_tts_and_play(`${sc_data['name']}说：${sc_data['text']}`);
+        function speak_superchat() {
+            let name = document.getElementById('div_sc_user_name').innerHTML;
+            let text = document.getElementById('div_sc_text').innerHTML;
+            get_tts_and_play(`${name}说：${text}`);
         }
 
         function hide_superchat() {
@@ -1342,6 +1347,7 @@
                 show_superchat(default_superchat);
             }
         }
+        setTimeout(() => {speak_superchat();}, 2000);
     </script>
 </body>
 </html>
