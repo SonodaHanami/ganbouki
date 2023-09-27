@@ -1,6 +1,7 @@
 <html>
 <head>
     <title>随机肉鸽许愿机</title>
+    <meta name="referrer" content="no-referrer">
     <link rel="icon" href="./favicon.ico">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QGM58QCD7C"></script>
     <script>
@@ -234,6 +235,7 @@
             </table>
         </div>
     </div>
+    <div id="div_audio" style="display:none"><audio id="audio" src="" controls="controls"></audio></div>
     <table class="table_text">
         <tr>
             <td>
@@ -1180,6 +1182,11 @@
             }
         }
 
+        function get_tts_and_play(text) {
+            document.getElementById('audio').src = `https://fanyi.baidu.com/gettts?lan=zh&spd=5&source=web&text=${text}`;
+            document.getElementById('audio').play();
+        }
+
         function get_superchat_color(price, unit) {
             let color = 'blue';
             if (unit == '源石锭') {
@@ -1221,6 +1228,8 @@
             document.getElementById('div_sc_text').innerHTML = sc_data['text'];
 
             document.getElementById('div_superchat').style.display = '';
+
+            get_tts_and_play(`${sc_data['name']}说：${sc_data['text']}`);
         }
 
         function hide_superchat() {

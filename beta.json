@@ -128,7 +128,7 @@
                     "name": "坎诺特",
                     "price": 30,
                     "unit": "源石锭",
-                    "text": "你好"
+                    "text": "你好，再见"
                 },
                 {
                     "face": "https://i0.hdslb.com/bfs/face/bedbca4020bb23eac6f27cf4655bc41d5e915915.jpg",
@@ -143,6 +143,13 @@
                     "price": 30,
                     "unit": "源石锭",
                     "text": "交易推迟"
+                },
+                {
+                    "face": "https://i0.hdslb.com/bfs/face/bedbca4020bb23eac6f27cf4655bc41d5e915915.jpg",
+                    "name": "坎诺特",
+                    "price": 30,
+                    "unit": "源石锭",
+                    "text": "欢迎下次光临"
                 }
             ]
         },
@@ -191,7 +198,7 @@
                     "name": "坎诺特",
                     "price": 30,
                     "unit": "源石锭",
-                    "text": "你好"
+                    "text": "你好，再见"
                 },
                 {
                     "face": "https://i0.hdslb.com/bfs/face/bedbca4020bb23eac6f27cf4655bc41d5e915915.jpg",
