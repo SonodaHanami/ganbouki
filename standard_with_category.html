@@ -1,0 +1,621 @@
+<html>
+
+<head>
+    <title>随机肉鸽许愿机</title>
+    <style>
+        body {
+            padding-top: 10px;
+            padding-left: 10px;
+            padding-right: 10px;
+            /* color: #FFF; */
+            /* text-shadow: -2px -2px #000, -2px -1px #000, -2px 0 #000, -2px 1px #000, -2px 2px #000, -1px -2px #000, -1px -1px #000, -1px 0 #000, -1px 1px #000, -1px 2px #000, 0 -2px #000, 0 -1px #000, 0 0 #000, 0 1px #000, 0 2px #000, 1px -2px #000, 1px -1px #000, 1px 0 #000, 1px 1px #000, 1px 2px #000, 2px -2px #000, 2px -1px #000, 2px 0 #000, 2px 1px #000, 2px 2px #000; */
+            text-align: center;
+        }
+
+        textarea {
+            width: 100%;
+            resize: none;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        .text {
+            width: 100%;
+            text-align: left;
+            table-layout: fixed;
+        }
+
+        .text tr {
+            height: 75px;
+        }
+
+        .text th {
+            font-size: 2em;
+            padding: 10px;
+        }
+
+        .text td {
+            height: 75px;
+            width: 50%;
+            font-size: 1.5em;
+        }
+
+        #tr_warning {
+            color: red;
+        }
+
+        td[id^="td_wish"], td[id^="td_cost"] {
+            border-width: 1px;
+            border-color: #AAAAAA;
+            border-top-style: solid;
+            border-bottom-style: solid;
+            border-left-style: dashed;
+            border-right-style: dashed;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        td[id^="td_cost"] span {
+            color: #FFA500;
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+
+        td[class="td_cost_not_paid"] {
+            background-color: #fedcba;
+        }
+
+        #div_wish_options {
+            position:absolute;
+            margin-top: 15px;
+        }
+
+        .div_button {
+            background-color: #F0F0F07F;
+            padding: 10px;
+            border-radius: 3px;
+            border-color: #000;
+            border-style: solid;
+            border-width: 1px;
+            text-align: center;
+        }
+
+        .wish_option {
+            background-color: #DDDDDD7F;
+            height: 32px;
+            padding: 3px 10px;
+            margin-top: 2px;
+            border-radius: 3px;
+            border-style: solid;
+            border-width: 1px;
+            border-color: #000;
+        }
+
+        .div_button:hover, .wish_option:hover {
+            background-color: #2B666666;
+        }
+
+        #tr_notice {
+            background-color: #ffbf92;
+        }
+
+        #td_notice {
+            width: 80%;
+            padding-left: 10px;
+        }
+
+        #td_notice_button {
+            width: 20%;
+            padding-right: 10px;
+            text-align: right;
+        }
+
+        .div_notice_button {
+            width: 50px;
+            display: inline-block;
+            background-color: #F0F0F07F;
+            padding: 10px;
+            border-radius: 3px;
+            border-color: #000;
+            border-style: solid;
+            border-width: 1px;
+            text-align: center;
+        }
+
+        .div_settings_button {
+            width: 150px;
+            display: inline-block;
+            background-color: #F0F0F07F;
+            padding: 10px;
+            border-radius: 3px;
+            border-color: #000;
+            border-style: solid;
+            border-width: 1px;
+            text-align: center;
+        }
+
+        #td_md5 {
+            text-align: center;
+            opacity: 0;
+        }
+
+        #td_md5:hover {
+            opacity: 1;
+            background-color: #2B666666;
+        }
+    </style>
+    <link rel="icon" href="./favicon.ico">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QGM58QCD7C"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-QGM58QCD7C');
+    </script>
+    <script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script>
+</head>
+
+<body>
+    <table class="text">
+        <tr>
+            <td>
+                <div class="div_button" id="div_settings" onclick="handle_button_settings();">设置</div>
+            </td>
+            <td>
+                <div class="div_button" onclick="location.reload();">清空（刷新）</div>
+            </td>
+        </tr>
+    </table>
+    <table class="text" id="table_settings" style="display:none">
+        <tr id="tr_warning" style="display:none"></tr>
+        <tr>
+            <td colspan="2">
+                当前设置md5：<span id="span_md5_1">undefined</span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div class="div_settings_button" onclick="handle_notice(101);">使用默认设置</div>
+                <div class="div_settings_button" onclick="handle_notice(102);">恢复之前设置</div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <p>
+                    愿望和代价每行一个，空行和每行前后的空格会被自动忽略<br>
+                    愿望与代价正文以两个竖杠分隔，例如：战斗||下一次战斗不能主动开启先锋干员技能<br>
+                    代价中的愿望只有和选中的愿望完全一致时才会被放入本次抽取的代价池中<br>
+                    你可以在代价中添加&lt;br&gt;以换行，添加&lt;input type="checkbox"&gt;以添加一个选择框<br>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input type="checkbox" id="checkbox_extra_cost" checked>随机触发“立即额外抽取1个代价”
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                愿望：
+                <textarea id="textarea_wish" rows="10"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                代价：
+                <textarea id="textarea_cost" rows="10"></textarea>
+            </td>
+        </tr>
+    </table>
+    <table class="text">
+        <tr id="tr_notice" style="display:none">
+            <td id="td_notice"></td>
+            <td id="td_notice_button"></td>
+        </tr>
+    </table>
+    <table class="text" id="table_text">
+        <tr>
+            <td colspan="2" id="td_md5" onclick="handle_td_md5();">
+                当前设置md5：<span id="span_md5_0">undefined</span>
+            </td>
+        </tr>
+        <tr>
+            <th>我可以</th>
+            <th>但代价是</th>
+        </tr>
+    </table>
+
+    <script>
+        const choose_one = "选择一个愿望";
+        const question_mark = '？';
+        const window_length = 10;
+        let current_row = 0;
+        let current_settings = {
+            "wish" : [],
+            "cost": [],
+        };
+        let current_wish_index = -1;
+        let last_toggle = 0;
+        let current_settings_md5 = '';
+        let default_settings_md5 = '';
+        let last_checked = ''; // the last checked default_settings_md5
+        let default_settings, update_message;
+        let extra_cost_count = 0;
+
+        function draw_row(new_row=true) {
+            let options, row_content;
+            if (new_row) {
+                current_row += 1;
+            }
+            options = `<div id="div_wish_options" style="display:none">`;
+            for (let i = 0; i < current_settings['wish'].length; i++) {
+                options += `
+                    <div class="wish_option" id="div_wish_option_${i}" onclick="handle_wish(${i});">
+                        ${current_settings['wish'][i]}
+                    </div>
+                `;
+            }
+            options += `</div>`;
+            wish_row_content = `
+                <td id="td_wish_${current_row}">
+                    <div class="div_button" id="div_wish" onclick="handle_wish(-1);">
+                        点击选择一个愿望
+                    </div>
+                    ${options}
+                </td>
+                <td id="td_cost_${current_row}" onclick="handle_cost_paid(this.id);">
+                    <div class="div_button" onclick="handle_cost();">点击随机抽取代价</div>
+                </td>
+            `;
+            if (new_row) {
+                document.getElementById("table_text").innerHTML += `
+                    <tr id="tr_${current_row}">
+                        ${wish_row_content}
+                    </tr>
+                `;
+                current_wish_index = -1;
+            }
+            else {
+                document.getElementById(`tr_${current_row}`).innerHTML = wish_row_content;
+            }
+        }
+
+        function handle_cost() {
+            let cost_index, cost_length;
+            let block_text, cost_text;
+            if (current_wish_index == -1) {
+                document.getElementById(`td_cost_${current_row}`).innerHTML = `<div class="div_button" onclick="handle_cost();">必须先选择一个愿望</div>`;
+                return;
+            }
+            // 获取愿望
+            let current_wish = current_settings['wish'][current_wish_index];
+            document.getElementById(`td_wish_${current_row}`).innerHTML = current_wish;
+            // 获取愿望对应的代价
+            let cost_pool = [];
+            for (let i = 0; i < current_settings['cost'].length; i++) {
+                let cost_split = current_settings['cost'][i].split('||');
+                if (cost_split.length == 2 && cost_split[0] == current_wish) {
+                    cost_pool.push(cost_split[1]);
+                }
+            }
+            block_text = question_mark.repeat(window_length);
+            cost_index = Math.floor(Math.random() * cost_pool.length);
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    let j = Math.floor(Math.random() * cost_pool.length);
+                    let text = cost_pool[j] + block_text;
+                    text = text.slice(0, window_length);
+                    draw_cost(current_row, text);
+                }, i * 100);
+            }
+            cost_text = cost_pool[cost_index];
+            // 20% extra cost
+            if (document.getElementById('checkbox_extra_cost').checked && Math.random() < 0.2 && extra_cost_count < 1) {
+                cost_text += '<br>{且立即额外抽取1个代价}';
+                extra_cost_count += 1;
+            }
+            cost_text = cost_text.replace(/{/g, '<span>').replace(/}/g, '</span>');
+            cost_length = cost_text.length;
+            setTimeout(() => draw_cost(current_row, block_text), 1000);
+            if (cost_length < window_length) {
+                for (let k = 1; k <= window_length; k++) {
+                    setTimeout(() => {
+                        let text = '';
+                        if (k + cost_length - window_length > 0) {
+                            text = cost_text.slice(window_length - k, cost_length);
+                        }
+                        text = block_text.slice(0, window_length - k) + text;
+                        text = text.slice(0, Math.max(cost_length, window_length - k));
+                        draw_cost(current_row, text);
+                    }, 1233 + k * 1000 / window_length);
+                }
+            }
+            else {
+                for (let k = 1; k <= cost_length; k++) {
+                    setTimeout(() => {
+                        let text = cost_text.slice(0, k);
+                        if (k < window_length) {
+                            text = text + block_text;
+                            text = text.slice(0, window_length);
+                        }
+                        draw_cost(current_row, text);
+                    }, 1233 + k * 1000 / cost_length);
+                }
+            }
+
+            setTimeout(() => draw_row(), 2333);
+        }
+
+        function draw_cost(row_idx, cost_text) {
+            document.getElementById(`td_cost_${row_idx}`).innerHTML = cost_text;
+        }
+
+        function handle_wish(wish_index) {
+            if (wish_index == -1) {
+                handle_wish_options_toggle(true);
+            }
+            else {
+                current_wish_index = wish_index;
+                document.getElementById(`div_wish`).innerHTML = current_settings['wish'][wish_index];
+                handle_wish_options_toggle();
+            }
+        }
+
+        function handle_wish_options_toggle(is_on=false) {
+            let now = new Date() * 1;
+            if (now - last_toggle < 100) {
+                return false;
+            }
+            if (is_on) {
+                if (document.getElementById('div_wish_options').style.display == "none") {
+                    document.getElementById('div_wish_options').style.display = "";
+                }
+                else {
+                    document.getElementById('div_wish_options').style.display = "none";
+                }
+            }
+            else {
+                if (document.getElementById('div_wish_options')) {
+                    document.getElementById('div_wish_options').style.display = "none";
+                }
+            }
+            last_toggle = now;
+        }
+
+        function handle_md5() {
+            current_settings_md5 = md5(JSON.stringify(current_settings));
+            default_settings_md5 = md5(JSON.stringify(default_settings));
+            document.getElementById('span_md5_0').innerHTML = current_settings_md5;
+            document.getElementById('span_md5_1').innerHTML = current_settings_md5;
+        }
+
+        function handle_td_md5() {
+            if (document.getElementById('td_md5').style.opacity == 0) {
+                document.getElementById('td_md5').style.opacity = 1;
+            }
+            else {
+                document.getElementById('td_md5').style.removeProperty('opacity');
+            }
+        }
+
+        function handle_notice(code, message) {
+            if (!code) {
+                // 隐藏提示
+                document.getElementById('tr_notice').style.display = 'none';
+                save_settings();
+            }
+            else if (code == 1 || code == 100) {
+                // 设置更新
+                set_settings_textarea();
+                handle_md5();
+                save_settings();
+                let notice_text = `设置已更新（${current_settings_md5.slice(0, 7)}）`
+                if (message) {
+                    notice_text = `设置已更新（${current_settings_md5.slice(0, 7)} ${message}）`
+                }
+                if (code == 1) {
+                    // 初始化默认设置
+                    notice_text = `已初始化默认设置（md5：${current_settings_md5}）`;
+                }
+                document.getElementById('td_notice').innerHTML = notice_text;
+                document.getElementById('td_notice_button').innerHTML = `
+                    <div class="div_notice_button" onclick="handle_button_settings();handle_notice();">查看</div>
+                    <div class="div_notice_button" onclick="handle_notice();">好的</div>
+                `;
+                document.getElementById('tr_notice').style.display = '';
+            }
+            else if (code == 101) {
+                // 使用新的默认设置
+                save_backup_settings();
+                set_default_settings();
+                handle_notice(100);
+            }
+            else if (code == 102) {
+                // 恢复以前的设置
+                set_backup_settings();
+                handle_notice(100);
+            }
+        }
+
+        function get_update_message() {
+            let xhr, repo_data, commit_data;
+            xhr = new XMLHttpRequest();
+            xhr.open('GET', 'https://api.github.com/repos/SonodaHanami/ganbouki/git/refs/heads/dev', false);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) {
+                    repo_data = JSON.parse(xhr.responseText);
+                    console.log('load repo data');
+                }
+            };
+            xhr.send(null);
+
+            if (!repo_data) return false;
+            xhr = new XMLHttpRequest();
+            xhr.open('GET', repo_data['object']['url'], false);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) {
+                    commit_data = JSON.parse(xhr.responseText);
+                    update_message = commit_data['message'];
+                    console.log('load commit data', commit_data['sha'].slice(0, 7), commit_data['message']);
+                }
+            };
+            xhr.send(null);
+        }
+
+        function get_default_settings() {
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', 'cost_with_category.json', false);
+            xhr.onreadystatechange = function() {
+                // readyState == 4说明请求已完成
+                if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) {
+                    // 从服务器获得数据
+                    default_settings = JSON.parse(xhr.responseText);
+                    console.log('load default_settings', md5(JSON.stringify(default_settings)));
+                }
+            };
+            xhr.send(null);
+        }
+
+        function set_backup_settings() {
+            // 使用备份设置
+            if (!window.localStorage) {
+                console.error("浏览器不支持localStorage");
+            }
+            else {
+                let storage = window.localStorage;
+                let backup_settings = JSON.parse(storage['data_ganbouki_backup'])
+                current_settings['wish'] = backup_settings['wish'];
+                current_settings['cost'] = backup_settings['cost'];
+                handle_md5();
+            }
+        }
+
+        function set_default_settings() {
+            // 使用默认设置
+            current_settings['wish'] = default_settings['wish'];
+            current_settings['cost'] = default_settings['cost'];
+            handle_md5();
+        }
+
+        function set_settings_textarea() {
+            document.getElementById('textarea_wish').value = current_settings['wish'].join('\n');
+            document.getElementById('textarea_cost').value = current_settings['cost'].join('\n');
+        }
+
+        function load_settings() {
+            if (!window.localStorage) {
+                console.error("浏览器不支持localStorage");
+            }
+            else {
+                console.log("load_settings()");
+                get_default_settings();
+                let storage = window.localStorage;
+                if (storage['data_ganbouki']) {
+                    const data = JSON.parse(storage['data_ganbouki']);
+                    current_settings['wish'] = data['wish'];
+                    current_settings['cost'] = data['cost'];
+                    handle_md5();
+                    if (default_settings) {
+                        last_checked = default_settings_md5;
+                        if (current_settings_md5 != default_settings_md5 && data['last_checked'] != default_settings_md5) {
+                            // 使用新的默认设置
+                            get_update_message();
+                            save_backup_settings();
+                            set_default_settings();
+                            set_settings_textarea();
+                            handle_md5();
+                            save_settings();
+                            handle_notice(100, update_message);
+                        }
+                    }
+                }
+                else {
+                    // 初始化
+                    set_default_settings();
+                    last_checked = default_settings_md5;
+                    handle_notice(1);
+                }
+                set_settings_textarea();
+            }
+        }
+
+        function save_settings() {
+            if (!window.localStorage) {
+                console.error("浏览器不支持localStorage");
+            }
+            else {
+                console.log("save_settings()");
+                let wish, cost, storage = window.localStorage;
+                wish = document.getElementById('textarea_wish').value.split('\n');
+                cost = document.getElementById('textarea_cost').value.split('\n');
+                current_settings['wish'] = [];
+                current_settings['cost'] = [];
+                for (let i = 0; i < wish.length; i++) {
+                    if (wish[i].trim().length > 0) {
+                        current_settings['wish'].push(wish[i].trim())
+                    }
+                }
+                for (let i = 0; i < cost.length; i++) {
+                    if (cost[i].trim().length > 0) {
+                        current_settings['cost'].push(cost[i].trim())
+                    }
+                }
+                document.getElementById('textarea_wish').value = current_settings['wish'].join('\n');
+                document.getElementById('textarea_cost').value = current_settings['cost'].join('\n');
+                let data_to_save = {
+                    'wish': current_settings['wish'],
+                    'cost': current_settings['cost'],
+                    'last_checked': last_checked,
+                };
+                storage['data_ganbouki'] = JSON.stringify(data_to_save);
+                handle_md5();
+                return true;
+            }
+        }
+
+        function save_backup_settings() {
+            if (!window.localStorage) {
+                console.error("浏览器不支持localStorage");
+            }
+            else {
+                console.log("save_backup_settings()");
+                let wish, cost, storage = window.localStorage;
+                storage['data_ganbouki_backup'] = JSON.stringify(current_settings);
+            }
+        }
+
+        function handle_button_settings() {
+            if (document.getElementById('table_settings').style.display == 'none') {
+                document.getElementById('table_settings').style.display = '';
+                document.getElementById('div_settings').innerHTML = "保存设置";
+            }
+            else {
+                if (save_settings()) {
+                    document.getElementById('tr_warning').style.display = 'none';
+                    document.getElementById('table_settings').style.display = 'none';
+                    document.getElementById('div_settings').innerHTML = '设置';
+                    draw_row(false);
+                };
+            }
+        }
+
+        function handle_cost_paid(target) {
+            console.log(target)
+            if (document.getElementById(target).classList.contains('td_cost_not_paid')) {
+                document.getElementById(target).classList.remove('td_cost_not_paid');
+            }
+            else {
+                document.getElementById(target).classList.add('td_cost_not_paid');
+            }
+        }
+
+        load_settings();
+        draw_row();
+        document.onclick = () => {
+            handle_wish_options_toggle();
+        }
+    </script>
+</body>
+</html>
